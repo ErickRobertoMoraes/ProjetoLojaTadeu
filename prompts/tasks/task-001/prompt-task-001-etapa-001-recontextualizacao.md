@@ -61,11 +61,14 @@ Se a correção necessária estiver fora do escopo, não a faça. Registre: prob
 - Etapa final só conclui TASK se DoD completo; caso contrário usar estado bloqueado/aguardando decisão/testes.
 
 ## 12. GATE DA ETAPA
+Estado inicial: GATE-001 = EM EXECUÇÃO. Não o marque como concluído antes de avaliar o checklist.
+
 Checklist: [ ] procedimento executado [ ] evidências anexadas [ ] critérios atendidos [ ] falhas resolvidas e revalidadas [ ] Scope Guard respeitado [ ] sem pendências impeditivas.
-GATES concluídos: X/1; pendentes: 7; status: APROVADO somente se todos os itens aplicáveis comprovados; senão BLOQUEADO. PRÓXIMA ETAPA: HABILITADA somente quando o gate atual estiver APROVADO.
+
+Após avaliar cada item, defina GATE-001 como APROVADO somente se todos os itens aplicáveis estiverem comprovados e não houver pendências impeditivas. Caso contrário, defina como BLOQUEADO e descreva o que falta. A etapa 002 só será habilitada com GATE-001 APROVADO.
 
 ## 13. STATUS ACUMULADO DOS GATES
-GATE-001 — Recontextualização: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
+GATE-001 — Recontextualização: EM EXECUÇÃO; após esta etapa, APROVADO somente com evidências deste relatório, senão BLOQUEADO
 GATE-002 — Contexto e histórico: PENDENTE
 GATE-003 — Pré-condições: PENDENTE
 GATE-004 — Planejamento: PENDENTE
@@ -73,7 +76,8 @@ GATE-005 — Implementação: PENDENTE
 GATE-006 — Revisão: PENDENTE
 GATE-007 — Testes manuais: PENDENTE
 GATE-008 — Validação final: PENDENTE
-GATES CONCLUÍDOS: X/8 (somente gates com relatório/evidência); GATES PENDENTES: 8-X. Um gate bloqueado não conta como concluído.
+
+No relatório final desta etapa, conte GATES CONCLUÍDOS como 1 se GATE-001 estiver APROVADO, ou 0 caso contrário. Conte GATES PENDENTES como 8 menos GATES CONCLUÍDOS. Conte GATES BLOQUEADOS como 1 se GATE-001 estiver BLOQUEADO, ou 0 caso contrário. GATE-002 a GATE-008 continuam PENDENTES nesta etapa; gate bloqueado não conta como concluído.
 
 ## 14. RESULTADO OBRIGATÓRIO
 Finalize exatamente com bloco equivalente:
