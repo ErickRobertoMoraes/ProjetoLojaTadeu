@@ -34,7 +34,7 @@ Preparar roteiro e artefatos para execução MANUAL pelo responsável em Windows
 1. Esta etapa requer execução humana MANUAL no ambiente Windows → WSL → Linux; o agente prepara roteiro, não marca testes como executados.
 2. Descubra a tecnologia/comandos a partir de manifests e documentação presentes. Se não houver aplicação ou ambiente, produza roteiro condicionado e marque casos como NÃO EXECUTADO/BLOQUEADO; não invente comandos. Scripts WSL são apropriados somente quando comandos e pré-requisitos forem conhecidos.
 3. Para cada teste relevante, inclua ID, objetivo, pré-condições, comandos exatos descobertos, procedimento numerado, resultado esperado, campos para resultado/evidência manual e estados NÃO EXECUTADO/APROVADO/REPROVADO/BLOQUEADO.
-4. Cubra critérios da TASK: {t['criteria']} e testes previstos: {t['tests']}; inclua autorização/segurança, erros e regressão aplicáveis.
+4. Cubra os critérios da TASK (build, lint, teste unitário de fumaça e estrutura modular documentada) e testes previstos (build, lint e teste unitário de fumaça); inclua acessibilidade básica aplicável, sem inventar controles de negócio.
 5. Registre totais previstos/executados/aprovados/reprovados/bloqueados/pendentes. Falha exige diagnóstico, correção dentro do escopo, revisão e reexecução manual; correção isolada não aprova teste.
 
 ## 7. RESTRIÇÕES
@@ -62,8 +62,10 @@ Se a correção necessária estiver fora do escopo, não a faça. Registre: prob
 - Etapa final só conclui TASK se DoD completo; caso contrário usar estado bloqueado/aguardando decisão/testes.
 
 ## 12. GATE DA ETAPA
-Checklist: [ ] procedimento executado [ ] evidências anexadas [ ] critérios atendidos [ ] falhas resolvidas e revalidadas [ ] Scope Guard respeitado [ ] sem pendências impeditivas.
-GATES concluídos: X/7; pendentes: 1; status: APROVADO somente se todos os itens aplicáveis comprovados; senão BLOQUEADO. PRÓXIMA ETAPA: HABILITADA somente quando o gate atual estiver APROVADO.
+Estado inicial: GATE-007 = EM EXECUÇÃO. O agente prepara o roteiro, mas o responsável executa MAN-001 e MAN-002 manualmente em WSL/Linux e preenche evidências. Marque APROVADO apenas se ambos estiverem executados e aprovados; caso contrário, BLOQUEADO/AGUARDANDO TESTES MANUAIS.
+
+Checklist: [ ] casos previstos identificados [ ] comandos confirmados nos manifests [ ] resultado/evidência manual preenchidos pelo responsável [ ] todos os casos obrigatórios aprovados [ ] sem falhas impeditivas.
+Se GATE-007 aprovado, GATES CONCLUÍDOS = 7, PENDENTES = 1, BLOQUEADOS = 0. Se ainda aguardando/bloqueado, GATES CONCLUÍDOS = 6, PENDENTES = 1, BLOQUEADOS = 1. A etapa 008 só pode concluir a TASK se GATE-007 estiver aprovado.
 
 ## 13. STATUS ACUMULADO DOS GATES
 GATE-001 — Recontextualização: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
@@ -72,9 +74,9 @@ GATE-003 — Pré-condições: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO A
 GATE-004 — Planejamento: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
 GATE-005 — Implementação: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
 GATE-006 — Revisão: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
-GATE-007 — Testes manuais: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
+GATE-007 — Testes manuais: EM EXECUÇÃO; exige evidência manual do responsável
 GATE-008 — Validação final: PENDENTE
-GATES CONCLUÍDOS: X/8 (somente gates com relatório/evidência); GATES PENDENTES: 8-X. Um gate bloqueado não conta como concluído.
+GATES CONCLUÍDOS: 7 se GATE-007 aprovado, senão 6; pendentes: 1; bloqueados: 0 se aprovado, senão 1. Gate bloqueado não conta como concluído.
 
 ## 14. RESULTADO OBRIGATÓRIO
 Finalize exatamente com bloco equivalente:

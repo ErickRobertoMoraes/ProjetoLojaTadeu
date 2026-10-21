@@ -61,8 +61,9 @@ Se a correção necessária estiver fora do escopo, não a faça. Registre: prob
 - Etapa final só conclui TASK se DoD completo; caso contrário usar estado bloqueado/aguardando decisão/testes.
 
 ## 12. GATE DA ETAPA
-Checklist: [ ] procedimento executado [ ] evidências anexadas [ ] critérios atendidos [ ] falhas resolvidas e revalidadas [ ] Scope Guard respeitado [ ] sem pendências impeditivas.
-GATES concluídos: X/8; pendentes: 0; status: APROVADO somente se todos os itens aplicáveis comprovados; senão BLOQUEADO. PRÓXIMA ETAPA: HABILITADA somente quando o gate atual estiver APROVADO.
+Estado inicial: GATE-008 = EM EXECUÇÃO. Revise relatórios e evidências anteriores. Se GATE-007 ou qualquer gate obrigatório estiver pendente/bloqueado, mantenha TASK-001 em IN_PROGRESS com resultado AGUARDANDO TESTES MANUAIS/DECISÃO; não aprove GATE-008 nem declare TASK DONE. Só aprove GATE-008 e conclua TASK-001 quando todos os gates obrigatórios e evidências manuais estiverem aprovados.
+
+Com todos os gates aprovados: concluídos 8, pendentes 0, bloqueados 0. Se GATE-007 estiver aguardando/bloqueado: concluídos 6, pendentes 0, bloqueados 2 (GATE-007 e GATE-008).
 
 ## 13. STATUS ACUMULADO DOS GATES
 GATE-001 — Recontextualização: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
@@ -71,9 +72,9 @@ GATE-003 — Pré-condições: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO A
 GATE-004 — Planejamento: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
 GATE-005 — Implementação: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
 GATE-006 — Revisão: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
-GATE-007 — Testes manuais: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
-GATE-008 — Validação final: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
-GATES CONCLUÍDOS: X/8 (somente gates com relatório/evidência); GATES PENDENTES: 8-X. Um gate bloqueado não conta como concluído.
+GATE-007 — Testes manuais: APROVADO somente com evidência manual preenchida pelo responsável; caso contrário, BLOQUEADO/AGUARDANDO TESTES MANUAIS
+GATE-008 — Validação final: EM EXECUÇÃO; depende das evidências e do gate manual GATE-007
+GATES CONCLUÍDOS: 8 somente se GATE-008 aprovado, caso contrário 6; pendentes: 0 se aprovado, caso contrário 0; bloqueados: 0 se aprovado, caso contrário 2 (GATE-007 e GATE-008). Gate bloqueado não conta como concluído.
 
 ## 14. RESULTADO OBRIGATÓRIO
 Finalize exatamente com bloco equivalente:
