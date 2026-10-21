@@ -32,10 +32,10 @@ Executar somente a implementação autorizada nesta TASK, após os gates anterio
 
 ## 6. PROCEDIMENTO DETALHADO
 1. Confirme GATE-001 a GATE-004 aprovados por evidência e que TASKS.md ainda autoriza execução. Se houver bloqueio, pare.
-2. Implemente o objetivo desta TASK: {obj}
+2. Implemente o objetivo desta TASK: criar a estrutura inicial do projeto, configurar TypeScript, convenções de qualidade e execução de testes, sem funcionalidades de negócio.
 3. Altere apenas ALLOWED_CHANGES; mudanças incidentais devem ser mínimas, necessárias, diretamente causadas, localizadas e não vedadas.
 4. Aplique ADRs aceitos, arquitetura modular Next.js/TypeScript/Route Handlers e Supabase conforme aplicável; nenhuma chave privilegiada no cliente. Não introduza dependências ou decisões sem necessidade/aprovação.
-5. Atenda aos critérios: {t['criteria']}
+5. Atenda aos critérios: build, lint e teste de exemplo executáveis; estrutura modular documentada.
 6. Registre arquivos e comandos realmente alterados/executados. Não avance TASK posterior nem modifique resultados de teste.
 
 ## 7. RESTRIÇÕES
@@ -63,19 +63,22 @@ Se a correção necessária estiver fora do escopo, não a faça. Registre: prob
 - Etapa final só conclui TASK se DoD completo; caso contrário usar estado bloqueado/aguardando decisão/testes.
 
 ## 12. GATE DA ETAPA
-Checklist: [ ] procedimento executado [ ] evidências anexadas [ ] critérios atendidos [ ] falhas resolvidas e revalidadas [ ] Scope Guard respeitado [ ] sem pendências impeditivas.
-GATES concluídos: X/5; pendentes: 3; status: APROVADO somente se todos os itens aplicáveis comprovados; senão BLOQUEADO. PRÓXIMA ETAPA: HABILITADA somente quando o gate atual estiver APROVADO.
+Estado inicial: GATE-005 = EM EXECUÇÃO. Não o marque como concluído antes de revisar a implementação e suas evidências.
+
+Checklist: [ ] objetivo implementado [ ] critérios de aceite atendidos [ ] alterações dentro de ALLOWED_CHANGES [ ] alterações incidentais justificadas [ ] validações executadas e resultados registrados [ ] sem pendências impeditivas.
+
+Após avaliar o checklist, defina GATE-005 como APROVADO somente se todos os itens aplicáveis estiverem comprovados e não houver pendências impeditivas. Caso contrário, defina como BLOQUEADO e descreva o que falta. A etapa 006 só será habilitada com GATE-005 APROVADO.
 
 ## 13. STATUS ACUMULADO DOS GATES
 GATE-001 — Recontextualização: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
 GATE-002 — Contexto e histórico: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
 GATE-003 — Pré-condições: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
 GATE-004 — Planejamento: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
-GATE-005 — Implementação: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
+GATE-005 — Implementação: EM EXECUÇÃO; após esta etapa, APROVADO somente com evidências deste relatório, senão BLOQUEADO
 GATE-006 — Revisão: PENDENTE
 GATE-007 — Testes manuais: PENDENTE
 GATE-008 — Validação final: PENDENTE
-GATES CONCLUÍDOS: X/8 (somente gates com relatório/evidência); GATES PENDENTES: 8-X. Um gate bloqueado não conta como concluído.
+No relatório final desta etapa, conte GATES CONCLUÍDOS como 5 se GATE-005 estiver APROVADO, ou 4 caso contrário. Conte GATES PENDENTES como 8 menos GATES CONCLUÍDOS menos GATES BLOQUEADOS. Conte GATES BLOQUEADOS como 1 se GATE-005 estiver BLOQUEADO, ou 0 caso contrário. GATE-006 a GATE-008 continuam PENDENTES nesta etapa; gate bloqueado não conta como concluído.
 
 ## 14. RESULTADO OBRIGATÓRIO
 Finalize exatamente com bloco equivalente:

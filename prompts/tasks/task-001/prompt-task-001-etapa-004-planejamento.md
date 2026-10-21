@@ -62,19 +62,22 @@ Se a correção necessária estiver fora do escopo, não a faça. Registre: prob
 - Etapa final só conclui TASK se DoD completo; caso contrário usar estado bloqueado/aguardando decisão/testes.
 
 ## 12. GATE DA ETAPA
-Checklist: [ ] procedimento executado [ ] evidências anexadas [ ] critérios atendidos [ ] falhas resolvidas e revalidadas [ ] Scope Guard respeitado [ ] sem pendências impeditivas.
-GATES concluídos: X/4; pendentes: 4; status: APROVADO somente se todos os itens aplicáveis comprovados; senão BLOQUEADO. PRÓXIMA ETAPA: HABILITADA somente quando o gate atual estiver APROVADO.
+Estado inicial: GATE-004 = EM EXECUÇÃO. Não o marque como concluído antes de avaliar este plano e seus critérios.
+
+Checklist: [ ] arquivos/componentes identificados ou lacunas explicitadas [ ] estratégia corresponde aos critérios [ ] Scope Guard respeitado [ ] comandos e evidências previstos [ ] riscos e rollback definidos [ ] sem decisão impeditiva pendente.
+
+Após avaliar o checklist, defina GATE-004 como APROVADO somente se todos os itens aplicáveis estiverem comprovados e não houver pendências impeditivas. Caso contrário, defina como BLOQUEADO e descreva o que falta. A etapa 005 só será habilitada com GATE-004 APROVADO.
 
 ## 13. STATUS ACUMULADO DOS GATES
 GATE-001 — Recontextualização: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
 GATE-002 — Contexto e histórico: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
 GATE-003 — Pré-condições: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
-GATE-004 — Planejamento: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
+GATE-004 — Planejamento: EM EXECUÇÃO; após esta etapa, APROVADO somente com evidências deste relatório, senão BLOQUEADO
 GATE-005 — Implementação: PENDENTE
 GATE-006 — Revisão: PENDENTE
 GATE-007 — Testes manuais: PENDENTE
 GATE-008 — Validação final: PENDENTE
-GATES CONCLUÍDOS: X/8 (somente gates com relatório/evidência); GATES PENDENTES: 8-X. Um gate bloqueado não conta como concluído.
+No relatório final desta etapa, conte GATES CONCLUÍDOS como 4 se GATE-004 estiver APROVADO, ou 3 caso contrário. Conte GATES PENDENTES como 8 menos GATES CONCLUÍDOS menos GATES BLOQUEADOS. Conte GATES BLOQUEADOS como 1 se GATE-004 estiver BLOQUEADO, ou 0 caso contrário. GATE-005 a GATE-008 continuam PENDENTES nesta etapa; gate bloqueado não conta como concluído.
 
 ## 14. RESULTADO OBRIGATÓRIO
 Finalize exatamente com bloco equivalente:

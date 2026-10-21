@@ -62,8 +62,10 @@ Se a correção necessária estiver fora do escopo, não a faça. Registre: prob
 - Etapa final só conclui TASK se DoD completo; caso contrário usar estado bloqueado/aguardando decisão/testes.
 
 ## 12. GATE DA ETAPA
-Checklist: [ ] procedimento executado [ ] evidências anexadas [ ] critérios atendidos [ ] falhas resolvidas e revalidadas [ ] Scope Guard respeitado [ ] sem pendências impeditivas.
-GATES concluídos: X/6; pendentes: 2; status: APROVADO somente se todos os itens aplicáveis comprovados; senão BLOQUEADO. PRÓXIMA ETAPA: HABILITADA somente quando o gate atual estiver APROVADO.
+Estado inicial: GATE-006 = EM EXECUÇÃO. Após a revisão, marque APROVADO se os achados estiverem corrigidos ou não houver impeditivos; caso contrário, BLOQUEADO e registre as evidências.
+
+Checklist: [ ] diff/status e arquivos revisados [ ] alterações mapeadas ao escopo [ ] segurança/acessibilidade aplicáveis revisadas [ ] documentação e TASKS registrados [ ] sem achados impeditivos.
+Com GATE-006 aprovado, GATES CONCLUÍDOS = 6, PENDENTES = 2, BLOQUEADOS = 0. Se bloqueado, GATES CONCLUÍDOS = 5, PENDENTES = 2, BLOQUEADOS = 1. GATE-007 e GATE-008 permanecem pendentes/bloqueados conforme o resultado desta revisão. A etapa 007 só é habilitada quando GATE-006 estiver aprovado.
 
 ## 13. STATUS ACUMULADO DOS GATES
 GATE-001 — Recontextualização: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
@@ -71,10 +73,10 @@ GATE-002 — Contexto e histórico: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓ
 GATE-003 — Pré-condições: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
 GATE-004 — Planejamento: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
 GATE-005 — Implementação: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
-GATE-006 — Revisão: CONCLUÍDO SOMENTE COM EVIDÊNCIA DO RELATÓRIO ANTERIOR
+GATE-006 — Revisão: EM EXECUÇÃO; avaliar e registrar evidência nesta etapa
 GATE-007 — Testes manuais: PENDENTE
 GATE-008 — Validação final: PENDENTE
-GATES CONCLUÍDOS: X/8 (somente gates com relatório/evidência); GATES PENDENTES: 8-X. Um gate bloqueado não conta como concluído.
+GATES CONCLUÍDOS: 6 se GATE-006 aprovado, senão 5; pendentes: 2; bloqueados: 0 se aprovado, senão 1. Gate bloqueado não conta como concluído.
 
 ## 14. RESULTADO OBRIGATÓRIO
 Finalize exatamente com bloco equivalente:
