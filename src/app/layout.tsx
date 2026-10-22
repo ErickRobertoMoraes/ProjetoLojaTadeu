@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "FitStore",
-  description: "Estrutura inicial do projeto FitStore.",
+  title: "FitStore | Produtos para academia",
+  description: "Acesse sua conta FitStore e gerencie seu perfil de cliente.",
 };
 
 export default function RootLayout({
