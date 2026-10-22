@@ -140,7 +140,7 @@ Agregados principais: **Pedido** (itens, endereço histórico, pagamento e trans
 
 ## Arquitetura Proposta
 
-Adotar monólito web em camadas com frontend e camada de API no mesmo repositório, preferencialmente **Next.js com TypeScript**. A escolha concreta entre Route Handlers e backend NestJS permanece registrada no ADR-001; para o MVP, Route Handlers reduzem a superfície operacional. Supabase concentra PostgreSQL, Auth, Storage e e-mail. Regras críticas de estoque/pedido devem residir em serviço transacional e/ou função de banco, nunca apenas no cliente.
+Adotar monólito web em camadas com frontend e camada de API no mesmo repositório, preferencialmente **Next.js com TypeScript**. Conforme decisão aceita no ADR-001, o MVP usa Route Handlers; NestJS permanece alternativa para evolução futura. Supabase concentra PostgreSQL, Auth, Storage e e-mail. Regras críticas de estoque/pedido devem residir em serviço transacional e/ou função de banco, nunca apenas no cliente.
 
 ```mermaid
 flowchart LR
@@ -232,6 +232,6 @@ Supabase Auth gerencia credenciais, verificação e recuperação. A aplicação
 | ID | Descrição | Impacto e condição |
 |---|---|---|
 | PD-001 | Requisitos acadêmicos posteriores do professor | Pode alterar apresentação, documentação ou stack; incorporar por decisão aprovada. |
-| PD-002 | Escolha final Route Handlers versus NestJS | Afeta estrutura do backend; resolver pelo ADR-001 antes de TASK-002. |
+| PD-002 | Escolha final Route Handlers versus NestJS | ENCERRADA pelo ADR-001 aceito: Route Handlers no MVP; NestJS é alternativa futura. |
 | PD-003 | Detalhes de design visual e identidade da loja | Afeta interface, não regras de domínio; resolver antes de UI final. |
 | PD-004 | Retenção de eventos de navegação | Afeta privacidade e custo; definir antes de produção/uso externo. |

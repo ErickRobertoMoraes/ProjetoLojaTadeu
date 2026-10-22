@@ -5,7 +5,7 @@
 | Ordem | TASK | Fase | Prioridade | Dependências | Estado |
 |---:|---|---|---|---|---|
 | 1 | TASK-001 | PHASE-01 | HIGH | NONE | DONE |
-| 2 | TASK-002 | PHASE-01 | HIGH | TASK-001 | BLOCKED |
+| 2 | TASK-002 | PHASE-01 | HIGH | TASK-001 | DONE |
 | 3 | TASK-003 | PHASE-01 | CRITICAL | TASK-002 | BLOCKED |
 | 4 | TASK-004 | PHASE-01 | CRITICAL | TASK-003 | BLOCKED |
 | 5 | TASK-005 | PHASE-01 | HIGH | TASK-004 | BLOCKED |
@@ -51,7 +51,7 @@ Todos os itens usam `INCIDENTAL_CHANGES_POLICY: MINIMAL_DIRECTLY_CAUSED_CHANGES_
 
 ### TASK-002 Contrato de dados e migrações iniciais
 
-**Status:** BLOCKED  
+**Status:** DONE
 **Phase:** PHASE-01  
 **Priority:** HIGH  
 **Dependências:** TASK-001  
@@ -64,6 +64,16 @@ Todos os itens usam `INCIDENTAL_CHANGES_POLICY: MINIMAL_DIRECTLY_CAUSED_CHANGES_
 
 **Critérios de aceitação:** entidades do README existem; PK/FK/checks/índices críticos são testados.  
 **Testes necessários:** migração limpa, integridade referencial, preço/estoque/nota válidos.
+
+**Etapas 001–004 (2026-10-21):** GATE-001 a GATE-004 aprovados. TASK-001 está DONE; histórico Git confirma o commit `89079cd`. A PD-002 foi encerrada conforme ADR-001 ACCEPTED (Route Handlers no MVP); texto do README alinhado à decisão existente, sem mudar arquitetura ou requisitos. DoR confirmado. Branch: `feature/TASK-002-schema-migrations`.
+
+**Etapa 004 — plano:** uma migration Supabase para as 16 entidades do Modelo Inicial de Dados, usando FK/checks e tipos PostgreSQL, índices do README e RLS com isolamento por titular/admin; sem seed porque o README não fornece tarifas/CEP/UF iniciais. Teste pgTAP para migração limpa, estrutura, integridade e RLS. Validação/descarte somente em banco local; sem aplicar em produção. UI e integrações seguem vedadas.
+
+**Etapa 005 — Implementação:** configuração Supabase, três migrations e teste pgTAP cobrindo as 16 entidades, PKs, índices, RLS, FKs, preço, estoque, nota, elegibilidade de avaliações e isolamento de acesso. Arquivos primários: `supabase/config.toml`, `supabase/migrations/20261021000100_initial_schema.sql`, `supabase/migrations/20261022180000_enforce_review_eligibility.sql`, `supabase/migrations/20261022190000_secure_review_eligibility_check.sql`, `supabase/tests/database/schema.test.sql` e este registro em `TASKS.md`. Alterações incidentais: alinhamento da PD-002 ao ADR-001 no `README.md`; roteiro/bootstrap de testes em `docs/testing/task-002-manual.md` e `docs/testing/task-002-pg-harness-bootstrap.sql`; dependência de desenvolvimento `supabase` e lockfile para tooling local durante a recuperação do ambiente.
+
+**Quality gates executados:** `supabase db reset` aplicou do zero as três migrations; `supabase test db --debug` passou com 86/86 asserções. `npm run lint` passou; `npm test` passou (1 arquivo, 1 teste); `npm run build` passou e gerou `/` e `/_not-found`. `git -c core.whitespace=cr-at-eol diff --check` passou; os avisos restantes são conversão LF/CRLF. Em 2026-10-22, a revisão GATE-006 encontrou que a política de avaliações não impunha RN-007 e que a leitura correlacionada direta era bloqueada por RLS. Corrigido com `20261022180000_enforce_review_eligibility.sql` e `20261022190000_secure_review_eligibility_check.sql`: função `SECURITY DEFINER` com `search_path` vazio, verificação obrigatória de `auth.uid()`, permissões de execução restritas a `authenticated` e políticas de insert/update que validam pedido entregue contendo o produto. A suíte cobre também leitura anônima, isolamento entre dois clientes, escrita cruzada negada e operações administrativas de cliente/admin. MAN-001 a MAN-005 aprovados; MAN-003 a MAN-005 foram simulados no nível das políticas do banco com pgTAP, sem alegar autenticação E2E via navegador. Aviso de perfil Supabase ausente não impediu a execução.
+
+**Gates e estado:** GATE-005 aprovado com reset limpo e suíte pgTAP 86/86 aprovada. GATE-006 aprovado após revisão técnica da política de avaliações e da matriz RLS. GATE-007 aprovado: MAN-001 a MAN-005 registrados em `docs/testing/task-002-manual.md`; MAN-003 a MAN-005 foram aprovados por simulação pgTAP dos roles/claims no nível de banco. GATE-008 aprovado com lint, teste unitário, build e diff-check aprovados. Scope Guard: migrations e testes de schema são primários e estão dentro de ALLOWED_CHANGES; documentação de teste e alinhamento pontual da PD-002 são incidentais, pequenas e diretamente relacionadas à TASK, sem alteração de arquitetura ou ultrapassar FORBIDDEN_CHANGES. DoD atendido; TASK-002 `DONE`. Branch: `feature/TASK-002-schema-migrations`. Nenhum commit foi criado. TASK-003 continua BLOCKED no backlog e não foi iniciada.
 
 ### TASK-003 Autenticação e perfil de cliente
 
