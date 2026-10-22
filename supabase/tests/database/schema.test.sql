@@ -69,17 +69,21 @@ values (
 insert into public.product_variants (id, product_id, sku, price_cents, stock) values
   ('10000000-0000-4000-8000-000000000003', '10000000-0000-4000-8000-000000000002', 'SCHEMA-TEST-1', 100, 10),
   ('10000000-0000-4000-8000-000000000005', '10000000-0000-4000-8000-000000000004', 'SCHEMA-TEST-2', 100, 10);
-insert into auth.users (id, email) values
-  ('20000000-0000-4000-8000-000000000001', 'task002-customer-a@example.test'),
-  ('20000000-0000-4000-8000-000000000002', 'task002-customer-b@example.test'),
-  ('20000000-0000-4000-8000-000000000003', 'task002-admin@example.test');
-insert into public.profiles (id, name, phone, cpf_formatted, role) values
-  ('20000000-0000-4000-8000-000000000001', 'Customer A', '11999990001', '000.000.000-01', 'customer'),
-  ('20000000-0000-4000-8000-000000000002', 'Customer B', '11999990002', '000.000.000-02', 'customer'),
-  ('20000000-0000-4000-8000-000000000003', 'Schema admin', '11999990003', '000.000.000-03', 'admin');
-insert into public.addresses (customer_id, postal_code, street, number, district, city, state, shipping_region) values
-  ('20000000-0000-4000-8000-000000000001', '01000-000', 'Test Street A', '1', 'Center', 'São Paulo', 'SP', 'sp'),
-  ('20000000-0000-4000-8000-000000000002', '20000-000', 'Test Street B', '2', 'Center', 'Rio de Janeiro', 'RJ', 'southeast');
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('20000000-0000-4000-8000-000000000001', 'task002-customer-a@example.test', jsonb_build_object(
+    'name', 'Customer A', 'phone', '11999990001', 'cpf_formatted', '529.982.247-25',
+    'address', jsonb_build_object('postal_code', '01000-000', 'street', 'Test Street A', 'number', '1',
+      'district', 'Center', 'city', 'São Paulo', 'state', 'SP', 'shipping_region', 'sp'))),
+  ('20000000-0000-4000-8000-000000000002', 'task002-customer-b@example.test', jsonb_build_object(
+    'name', 'Customer B', 'phone', '11999990002', 'cpf_formatted', '111.444.777-35',
+    'address', jsonb_build_object('postal_code', '20000-000', 'street', 'Test Street B', 'number', '2',
+      'district', 'Center', 'city', 'Rio de Janeiro', 'state', 'RJ', 'shipping_region', 'southeast'))),
+  ('20000000-0000-4000-8000-000000000003', 'task002-admin@example.test', jsonb_build_object(
+    'name', 'Schema admin', 'phone', '11999990003', 'cpf_formatted', '935.411.347-80',
+    'address', jsonb_build_object('postal_code', '01000-000', 'street', 'Admin Street', 'number', '3',
+      'district', 'Center', 'city', 'São Paulo', 'state', 'SP', 'shipping_region', 'sp'),
+    'role', 'admin'));
+update public.profiles set role = 'admin' where id = '20000000-0000-4000-8000-000000000003';
 insert into public.carts (customer_id) values
   ('20000000-0000-4000-8000-000000000001'),
   ('20000000-0000-4000-8000-000000000002');
@@ -216,7 +220,7 @@ reset role;
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '20000000-0000-4000-8000-000000000003', true);
 select is((select count(*) from public.profiles), 3::bigint, 'active admin can read profiles');
-select is((select count(*) from public.addresses), 2::bigint, 'active admin can read customer addresses');
+select is((select count(*) from public.addresses), 3::bigint, 'active admin can read customer addresses');
 select is((select count(*) from public.coupons), 1::bigint, 'active admin can read coupons');
 select lives_ok(
   $$insert into public.categories (name, slug, active)

@@ -29,3 +29,90 @@ p {
   max-width: 60ch;
   line-height: 1.6;
 }
+
+a {
+  color: #176b45;
+}
+
+.identity-page {
+  width: min(100% - 2rem, 42rem);
+}
+
+.identity-page > h1 {
+  margin-block: 1rem 0.5rem;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+}
+
+.identity-form {
+  display: grid;
+  gap: 1rem;
+  margin-block: 1.5rem;
+}
+
+.identity-form h2 {
+  margin: 1rem 0 0;
+  font-size: 1.25rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+.form-field input,
+.form-field select {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #aab8ae;
+  border-radius: 0.35rem;
+  background: white;
+  color: inherit;
+  font: inherit;
+}
+
+.identity-form button,
+.secondary-button {
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border: 0;
+  border-radius: 0.35rem;
+  background: #176b45;
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.identity-form button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.secondary-button {
+  background: #34483d;
+}
+
+.form-error,
+.form-success {
+  margin: 0;
+  padding: 0.75rem;
+  border-radius: 0.35rem;
+}
+
+.form-error {
+  background: #ffeded;
+  color: #8b1e1e;
+}
+
+.form-success {
+  background: #e8f5ed;
+  color: #145a35;
+}
+
+.home-links {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}

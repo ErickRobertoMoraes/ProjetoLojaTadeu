@@ -6,7 +6,7 @@
 |---:|---|---|---|---|---|
 | 1 | TASK-001 | PHASE-01 | HIGH | NONE | DONE |
 | 2 | TASK-002 | PHASE-01 | HIGH | TASK-001 | DONE |
-| 3 | TASK-003 | PHASE-01 | CRITICAL | TASK-002 | BLOCKED |
+| 3 | TASK-003 | PHASE-01 | CRITICAL | TASK-002 | DONE |
 | 4 | TASK-004 | PHASE-01 | CRITICAL | TASK-003 | BLOCKED |
 | 5 | TASK-005 | PHASE-01 | HIGH | TASK-004 | BLOCKED |
 | 6 | TASK-006 | PHASE-02 | HIGH | TASK-005 | BLOCKED |
@@ -77,7 +77,7 @@ Todos os itens usam `INCIDENTAL_CHANGES_POLICY: MINIMAL_DIRECTLY_CAUSED_CHANGES_
 
 ### TASK-003 Autenticação e perfil de cliente
 
-**Status:** BLOCKED  
+**Status:** DONE
 **Phase:** PHASE-01  
 **Priority:** CRITICAL  
 **Dependências:** TASK-002  
@@ -86,10 +86,22 @@ Todos os itens usam `INCIDENTAL_CHANGES_POLICY: MINIMAL_DIRECTLY_CAUSED_CHANGES_
 **Objetivo:** Implementar cadastro, sessão, confirmação de e-mail, recuperação, perfil e endereço único.
 
 **ALLOWED_CHANGES:** módulos identity/profile, migrations/policies diretamente necessárias, testes Auth e `TASKS.md`.  
-**FORBIDDEN_CHANGES:** promoção administrativa, checkout, catálogo.
+**FORBIDDEN_CHANGES:** promoção administrativa, implementação do checkout além da barreira de confirmação de e-mail exigida por RN-001, catálogo.
 
 **Critérios de aceitação:** e-mail não confirmado é impedido de iniciar checkout; CPF recebe máscara/estrutura; um endereço é mantido.  
 **Testes necessários:** integração Auth, API validação e acesso cruzado negado.
+
+**Decisão de escopo autorizada pelo usuário:** permitir somente uma barreira reutilizável no servidor que impeça usuário sem e-mail confirmado de iniciar checkout, com testes associados (RN-001). Não implementar carrinho, cotação, frete, pedido, pagamento ou qualquer fluxo de checkout. Promoção administrativa e catálogo continuam proibidos.
+
+**Etapas 001–004 — prontidão, histórico, pré-condições e plano:** TASK-002 está `DONE` no commit `ab34b15` e a branch remota correspondente aponta para esse commit; ADR-002 está `ACCEPTED`; aplicação atual é Next.js 16/React 19 com TypeScript, sem módulos de autenticação ou perfil. O usuário autorizou a exceção estreita de escopo acima. Ambiente local validado pelo usuário: Node 20.20.2, Supabase CLI 2.121.0, Docker 29.3.1; Supabase Auth ficou `running` após conectar `supabase_db_Projeto_Loja_Tadeu` a `supabase_network_Projeto_Loja_Tadeu` e reiniciá-lo. O banco antigo `supabase_db_fitstore` foi parado para liberar 54322; nenhum container ou volume foi removido. Planejamento: clientes Supabase SSR no servidor/navegador; formulários e Route Handlers de cadastro, login, logout, confirmação/callback e recuperação; migração com criação segura de `profiles`/`addresses` no signup e sincronização da confirmação; validação CPF local de estrutura/dígitos sem consulta externa; endereço único preservado pela PK existente; função de guarda de confirmação no servidor, sem fluxo de checkout. Testes: unitários de CPF/validação, testes de rotas e autorização, pgTAP para trigger, RLS, papel e endereço único, além de roteiro manual para cadastro/confirmação/recuperação/perfil. Sem promoção administrativa, catálogo, pedido, cotação ou pagamento.
+
+**Gates da TASK-003:** GATE-001 a GATE-004 aprovados com as evidências registradas acima; branch `feature/TASK-003-auth-profile`. Dois backups de configuração (`supabase/config.toml.bak` e `supabase/config.toml.old`) já estavam staged pelo usuário antes do início e serão preservados, sem integrar ao escopo ou commit desta TASK.
+
+**Quality gates finais (2026-10-22):** `npm run lint` aprovado; `npm test` aprovado (3 arquivos, 8 testes); `npm run build` aprovado no WSL com URL local e chave publishable, incluindo TypeScript e geração das 16 páginas; `supabase db reset` aplicou as migrations; `supabase test db --debug` aprovado (2 arquivos, 97 asserções); `npm audit --omit=dev` aprovado (0 vulnerabilidades de produção); `git diff --check` aprovado (somente avisos informativos de conversão LF/CRLF). O build exibiu aviso de depreciação do Node.js 20 no `@supabase/supabase-js`, sem falhar. Nesta retomada, `npm audit` inicialmente não alcançou o registry devido a DNS da sandbox; a repetição com rede autorizada passou.
+
+**GATE-007 / testes manuais locais:** cadastro descartável retornou HTTP 201 e confirmação chegou ao Mailpit; o link de confirmação redirecionou para `/perfil` e a página respondeu 200. `POST /api/checkout/guard`: anônimo 401 `unauthenticated`, usuário confirmado 200. `PATCH /api/profile` retornou 200; `POST /api/auth/recovery` retornou 200 e o link de recuperação redirecionou para `/redefinir-senha` (200); `PATCH /api/auth/password` retornou 200; novo login após logout retornou 200 e a guarda respondeu 200. Dados usados foram sintéticos e descartáveis. Casos de e-mail não confirmado são cobertos pelo teste unitário da autorização; trigger, unicidade do endereço, RLS e acesso cruzado são cobertos pelos 97 asserts pgTAP. Evidências detalhadas em `docs/testing/task-003-manual.md`.
+
+**Relatório de conclusão:** estado `DONE`, branch `feature/TASK-003-auth-profile`, nenhum commit criado. Arquivos primários: módulos `src/lib/identity/`, `src/lib/supabase/`, `src/app/api/`, páginas de autenticação/perfil em `src/app/`, `src/components/identity/`, migration `supabase/migrations/20261022200000_task003_auth_profile.sql`, testes `src/lib/identity/*.test.ts`, `supabase/tests/database/auth_profile.test.sql` e `src/app/api/checkout/guard/route.ts`. Incidentes: ajustes de configuração/redirecionamento em `supabase/config.toml`, shell/layout/página inicial e documentação de execução em `docs/testing/task-003-manual.md` e `TASKS.md`, diretamente necessários à autenticação e comprovação dos critérios. Scope Guard validado: barreira de checkout limitada à confirmação de e-mail conforme autorização explícita; nenhum catálogo, carrinho, pedido, cotação, frete ou pagamento foi implementado. Backups staged `supabase/config.toml.bak` e `supabase/config.toml.old` foram preservados fora do escopo. GATE-001 a GATE-008 aprovados; DoD atendido. TASK-004 continua sem início; é a próxima dependência a reavaliar.
 
 ### TASK-004 Papéis e RLS
 
