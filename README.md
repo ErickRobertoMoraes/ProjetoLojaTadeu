@@ -220,12 +220,15 @@ Supabase Auth gerencia credenciais, verificação e recuperação. A aplicação
 
 | RF | RN | RNF | UC | Entidade | API | Teste | TASK |
 |---|---|---|---|---|---|---|---|
-| RF-001 | RN-001 | RNF-001,002 | UC-001 | profiles, addresses | auth/profile | integração Auth/RLS | TASK-003,004 |
+| RF-001 | RN-001 | RNF-001,002,003 | UC-001 | profiles, addresses | auth/profile | integração Auth/RLS e estrutura de CPF | TASK-003,004 |
+| RF-002 | RN-009 | RNF-001,010 | UC-008 | profiles | admin/users/access | matriz de permissões e tentativas de escalada | TASK-004 |
 | RF-003,004 | RN-003 | RNF-005,006 | UC-002 | products, variants, images | products | unit/API/E2E catálogo | TASK-006,007 |
-| RF-005 a 007 | RN-002 a 006 | RNF-004,010 | UC-003 | carts, orders, items, coupons | cart/checkout/orders | integração transação/E2E compra | TASK-009 a 012 |
+| RF-005 a 007 | RN-002 a 006 | RNF-004,008,010 | UC-003 | carts, orders, items, coupons | cart/checkout/orders | integração transação/E2E compra | TASK-009 a 012 |
+| RF-011 | RN-006 | RNF-010 | UC-003 | coupons | admin/coupons, checkout/quote | regras de validade, mínimo, limite e autorização | TASK-008,011 |
 | RF-008,009 | RN-004,005 | RNF-004,007 | UC-004,006 | orders, audit_logs | orders/admin orders | unit/API/E2E status | TASK-012,013 |
 | RF-010,015,016 | RN-009 | RNF-001,007 | UC-005,008 | catálogo, regiões, audit | admin | API autorização | TASK-008,014 |
 | RF-012,013,014 | RN-007,008 | RNF-001,007 | UC-007 | reviews, events | reviews/recommendations | unit/API/E2E | TASK-015 a 017 |
+| — | — | RNF-009 | — | plano de backup Supabase | operação | restauração testada antes de uso real | TASK-005,018 |
 
 ## Pendências
 

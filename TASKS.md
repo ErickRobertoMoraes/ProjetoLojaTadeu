@@ -8,7 +8,7 @@
 | 2 | TASK-002 | PHASE-01 | HIGH | TASK-001 | DONE |
 | 3 | TASK-003 | PHASE-01 | CRITICAL | TASK-002 | DONE |
 | 4 | TASK-004 | PHASE-01 | CRITICAL | TASK-003 | DONE |
-| 5 | TASK-005 | PHASE-01 | HIGH | TASK-004 | BLOCKED |
+| 5 | TASK-005 | PHASE-01 | HIGH | TASK-004 | DONE |
 | 6 | TASK-006 | PHASE-02 | HIGH | TASK-005 | BLOCKED |
 | 7 | TASK-007 | PHASE-02 | HIGH | TASK-006 | BLOCKED |
 | 8 | TASK-008 | PHASE-02 | HIGH | TASK-007 | BLOCKED |
@@ -123,7 +123,7 @@ Todos os itens usam `INCIDENTAL_CHANGES_POLICY: MINIMAL_DIRECTLY_CAUSED_CHANGES_
 
 ### TASK-005 Checkpoint PHASE-01
 
-**Status:** BLOCKED  
+**Status:** DONE
 **Phase:** PHASE-01  
 **Priority:** HIGH  
 **Dependências:** TASK-004  
@@ -136,6 +136,14 @@ Todos os itens usam `INCIDENTAL_CHANGES_POLICY: MINIMAL_DIRECTLY_CAUSED_CHANGES_
 
 **Critérios de aceitação:** build/lint/testes passam; RLS e rastreabilidade revisadas.  
 **Testes necessários:** suíte completa da fase e verificação manual de variáveis/segredos.
+
+**Etapas 001–004 — prontidão, histórico, pré-condições e plano:** TASK-001 a TASK-004 estão `DONE` no backlog; TASK-004 é dependência concluída e o `main` contém o merge `0107f1f` da TASK-004. ADR-001, ADR-002 e ADR-003 estão `ACCEPTED`. Scope Guard confirmado: somente testes, ajustes mínimos de configuração/documentação e este registro; nenhuma funcionalidade de catálogo ou compra. Plano: executar lint, testes unitários, build e suíte pgTAP após `supabase db reset`; revisar RLS e a matriz do README contra migrations/testes; conferir apenas nomes/presença de variáveis necessárias e exclusão de arquivos `.env`, sem ler ou registrar valores secretos. Branch `feature/TASK-005-checkpoint-phase-01`.
+
+**Relatório de conclusão — Etapas 5/5:** `npm run lint` aprovado; `npm test` aprovado (4 arquivos, 15 testes); `npm run build` aprovado no WSL com Node 22.23.4 e variáveis públicas Supabase (17 rotas); `npm audit` aprovado (0 vulnerabilidades); `supabase db reset` aprovado e aplicou as cinco migrations; `supabase test db --debug` aprovado (3 arquivos, 111 assertions); `git diff --check` aprovado. O CLI global efetivamente usado nos gates locais foi 2.121.0; o aviso de atualização para 2.122.0 e o perfil Supabase ausente não impediram o reset nem os testes. O aviso `no files matched pattern: supabase/seed.sql` é esperado porque não há seed configurado.
+
+Arquivos primários: `TASKS.md`, registro do checkpoint e gates; `README.md`, complementação da matriz de rastreabilidade para RF-002/RF-011 e RNF-003/RNF-008/RNF-009. Incidental autorizada pelo usuário após SCOPE ESCALATION: `package.json` e `package-lock.json`, atualização da dependência de desenvolvimento `supabase` de `^2.54.11` para `^2.122.0` para corrigir a vulnerabilidade crítica da cadeia `tar` indicada pelo gate de auditoria; a auditoria final reportou zero vulnerabilidades. Nenhum commit foi criado.
+
+Revisão de segurança: `.env` e `.env.*` são ignorados pelo Git e não há arquivo `.env` versionado; o código de aplicação usa URL/chave anon públicas, sem chave privilegiada no cliente. RLS está habilitado em todas as tabelas de domínio; a suíte pgTAP cobre isolamento de dados, acesso anônimo/admin, mutações não autorizadas e invariantes de papel. Rastreabilidade documental revisada e lacunas corrigidas sem alterar requisitos. Scope Guard: mudanças primárias PRIMARY dentro de `ALLOWED_CHANGES`; atualização de dependência INCIDENTAL, mínima, diretamente causada pelo gate de segurança e autorizada pelo usuário; nenhum item de `FORBIDDEN_CHANGES` alterado. DoD atendido; TASK-005 `DONE` na branch `feature/TASK-005-checkpoint-phase-01`. Próxima TASK: TASK-006 permanece `BLOCKED` no backlog e não foi iniciada nesta execução.
 
 ### TASK-006 Catálogo e categorias
 
