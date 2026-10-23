@@ -9,7 +9,7 @@
 | 3 | TASK-003 | PHASE-01 | CRITICAL | TASK-002 | DONE |
 | 4 | TASK-004 | PHASE-01 | CRITICAL | TASK-003 | DONE |
 | 5 | TASK-005 | PHASE-01 | HIGH | TASK-004 | DONE |
-| 6 | TASK-006 | PHASE-02 | HIGH | TASK-005 | BLOCKED |
+| 6 | TASK-006 | PHASE-02 | HIGH | TASK-005 | DONE |
 | 7 | TASK-007 | PHASE-02 | HIGH | TASK-006 | BLOCKED |
 | 8 | TASK-008 | PHASE-02 | HIGH | TASK-007 | BLOCKED |
 | 9 | TASK-009 | PHASE-02 | HIGH | TASK-008 | BLOCKED |
@@ -147,7 +147,7 @@ Revisão de segurança: `.env` e `.env.*` são ignorados pelo Git e não há arq
 
 ### TASK-006 Catálogo e categorias
 
-**Status:** BLOCKED  
+**Status:** DONE
 **Phase:** PHASE-02  
 **Priority:** HIGH  
 **Dependências:** TASK-005  
@@ -160,6 +160,16 @@ Revisão de segurança: `.env` e `.env.*` são ignorados pelo Git e não há arq
 
 **Critérios de aceitação:** categorias Roupas, Suplementos e Acessórios são navegáveis; filtros e paginação funcionam.  
 **Testes necessários:** unitários de filtros, API e autorização admin.
+
+**Etapa 1 — prontidão e escopo:** TASK-005 `DONE` no commit `8225650`; branch criada a partir desse estado: `feature/TASK-006-catalog-categories`. ADR-001 e ADR-002 aceitos. Scope Guard: implementar descoberta pública e administração base de categorias/produtos; preservar as tabelas/RLS atuais; não implementar variações, imagens/Storage, gestão de estoque, carrinho, pedidos ou cupons, que pertencem a outras TASKs. Critérios confirmados contra RF-003/RF-010, RNF-001/005/006/010 e UC-002/005. Planejado: consultas paginadas e filtros por categoria/marca/faixa de preço/objetivo, navegação pelas três categorias requeridas, gestão administrativa protegida por sessão e papel, validação de entradas e testes unitários/API/autorização. Preços serão lidos das variações já definidas no schema, sem editar suas regras ou permitir escrita nesta TASK. Ambiente usa Next.js 16 App Router; guias locais de Route Handlers e data fetching serão seguidos.
+
+**Relatório de conclusão — Etapas 2/2:** catálogo público implementado em `/produtos`, com navegação para Roupas, Suplementos e Acessórios, busca textual, filtros por categoria/marca/objetivo/faixa de preço e paginação de 12 itens. API pública `GET /api/products` valida parâmetros, pagina no banco e retorna erros genéricos. Painel `/admin/catalogo` permite criar/editar/ativar categorias e produtos; APIs administrativas exigem usuário autenticado com perfil admin ativo e continuam protegidas por RLS. Exclusão de categoria é recusada se houver produto vinculado; produto é arquivado por `active=false` para preservar referências. Migration adiciona as três categorias requeridas.
+
+Gates aprovados: `npm test` (7 arquivos, 39 testes); `npm run lint`; `npm run build` no WSL com Node 22.23.4 e variáveis públicas Supabase (22 rotas); `supabase migration up`; `supabase test db --debug` (4 arquivos, 125 assertions); `git diff --check`. O pgTAP cobre categorias iniciais, leitura pública, bloqueio de escrita para anon/cliente e operações/administração de categorias e produtos. Testes de rota API verificam respostas 400/401/403; testes unitários cobrem filtros, paginação, validação e autorização ativa.
+
+Arquivos primários: `src/app/page.tsx`, `src/app/produtos/page.tsx`, `src/app/admin/catalogo/page.tsx`, `src/app/api/products/route.ts`, `src/app/api/admin/catalog/`, `src/components/catalog/admin-panel.tsx`, `src/lib/catalog/`, `supabase/migrations/20261023120000_task006_catalog_categories.sql`, `supabase/tests/database/task006_catalog.test.sql` e este registro em `TASKS.md`. Alteração incidental: `vitest.config.ts` agora resolve o alias `@/` para permitir testes dos Route Handlers; limitada à configuração de testes e diretamente necessária à cobertura de API.
+
+Scope Guard: mudanças primárias PRIMARY dentro de `ALLOWED_CHANGES`; alteração incidental MINIMAL e diretamente causada pelos testes; nenhum item de `FORBIDDEN_CHANGES` alterado. Variações, imagens/Storage, gestão de estoque, carrinho, pedidos e cupons não foram implementados. DoD atendido; TASK-006 `DONE` na branch `feature/TASK-006-catalog-categories`. Nenhum commit foi criado. Próxima TASK: TASK-007 permanece `BLOCKED` e não foi iniciada.
 
 ### TASK-007 Variações imagens e estoque
 
