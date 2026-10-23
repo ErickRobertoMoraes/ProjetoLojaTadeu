@@ -7,7 +7,7 @@
 | 1 | TASK-001 | PHASE-01 | HIGH | NONE | DONE |
 | 2 | TASK-002 | PHASE-01 | HIGH | TASK-001 | DONE |
 | 3 | TASK-003 | PHASE-01 | CRITICAL | TASK-002 | DONE |
-| 4 | TASK-004 | PHASE-01 | CRITICAL | TASK-003 | BLOCKED |
+| 4 | TASK-004 | PHASE-01 | CRITICAL | TASK-003 | DONE |
 | 5 | TASK-005 | PHASE-01 | HIGH | TASK-004 | BLOCKED |
 | 6 | TASK-006 | PHASE-02 | HIGH | TASK-005 | BLOCKED |
 | 7 | TASK-007 | PHASE-02 | HIGH | TASK-006 | BLOCKED |
@@ -101,11 +101,11 @@ Todos os itens usam `INCIDENTAL_CHANGES_POLICY: MINIMAL_DIRECTLY_CAUSED_CHANGES_
 
 **GATE-007 / testes manuais locais:** cadastro descartável retornou HTTP 201 e confirmação chegou ao Mailpit; o link de confirmação redirecionou para `/perfil` e a página respondeu 200. `POST /api/checkout/guard`: anônimo 401 `unauthenticated`, usuário confirmado 200. `PATCH /api/profile` retornou 200; `POST /api/auth/recovery` retornou 200 e o link de recuperação redirecionou para `/redefinir-senha` (200); `PATCH /api/auth/password` retornou 200; novo login após logout retornou 200 e a guarda respondeu 200. Dados usados foram sintéticos e descartáveis. Casos de e-mail não confirmado são cobertos pelo teste unitário da autorização; trigger, unicidade do endereço, RLS e acesso cruzado são cobertos pelos 97 asserts pgTAP. Evidências detalhadas em `docs/testing/task-003-manual.md`.
 
-**Relatório de conclusão:** estado `DONE`, branch `feature/TASK-003-auth-profile`, nenhum commit criado. Arquivos primários: módulos `src/lib/identity/`, `src/lib/supabase/`, `src/app/api/`, páginas de autenticação/perfil em `src/app/`, `src/components/identity/`, migration `supabase/migrations/20261022200000_task003_auth_profile.sql`, testes `src/lib/identity/*.test.ts`, `supabase/tests/database/auth_profile.test.sql` e `src/app/api/checkout/guard/route.ts`. Incidentes: ajustes de configuração/redirecionamento em `supabase/config.toml`, shell/layout/página inicial e documentação de execução em `docs/testing/task-003-manual.md` e `TASKS.md`, diretamente necessários à autenticação e comprovação dos critérios. Scope Guard validado: barreira de checkout limitada à confirmação de e-mail conforme autorização explícita; nenhum catálogo, carrinho, pedido, cotação, frete ou pagamento foi implementado. Backups staged `supabase/config.toml.bak` e `supabase/config.toml.old` foram preservados fora do escopo. GATE-001 a GATE-008 aprovados; DoD atendido. TASK-004 continua sem início; é a próxima dependência a reavaliar.
+**Relatório de conclusão:** estado `DONE`, branch `feature/TASK-003-auth-profile`, nenhum commit criado. Arquivos primários: módulos `src/lib/identity/`, `src/lib/supabase/`, `src/app/api/`, páginas de autenticação/perfil em `src/app/`, `src/components/identity/`, migration `supabase/migrations/20261022200000_task003_auth_profile.sql`, testes `src/lib/identity/*.test.ts`, `supabase/tests/database/auth_profile.test.sql` e `src/app/api/checkout/guard/route.ts`. Incidentes: ajustes de configuração/redirecionamento em `supabase/config.toml`, shell/layout/página inicial e documentação de execução em `docs/testing/task-003-manual.md` e `TASKS.md`, diretamente necessários à autenticação e comprovação dos critérios. Scope Guard validado: barreira de checkout limitada à confirmação de e-mail conforme autorização explícita; nenhum catálogo, carrinho, pedido, cotação, frete ou pagamento foi implementado. Backups staged `supabase/config.toml.bak` e `supabase/config.toml.old` foram preservados fora do escopo. GATE-001 a GATE-008 aprovados; DoD atendido. TASK-004 foi concluída na branch `feature/TASK-004-roles-rls`; TASK-005 (checkpoint PHASE-01) permanece BLOCKED e não foi iniciada.
 
 ### TASK-004 Papéis e RLS
 
-**Status:** BLOCKED  
+**Status:** DONE
 **Phase:** PHASE-01  
 **Priority:** CRITICAL  
 **Dependências:** TASK-003  
@@ -118,6 +118,8 @@ Todos os itens usam `INCIDENTAL_CHANGES_POLICY: MINIMAL_DIRECTLY_CAUSED_CHANGES_
 
 **Critérios de aceitação:** cliente não lê nem altera dados alheios; admin autorizado promove/desativa; não se remove o último admin ativo.  
 **Testes necessários:** matriz de permissões e tentativas de escalada.
+
+**Relatório de conclusão:** estado `DONE`; branch `feature/TASK-004-roles-rls`; nenhum commit criado. Arquivos primários: `src/app/api/admin/users/access/route.ts`, `src/lib/identity/admin-access.ts`, `src/lib/identity/admin-access.test.ts`, `supabase/migrations/20261022210000_task004_roles_rls.sql`, `supabase/tests/database/task004_roles_rls.test.sql` e `supabase/tests/database/auth_profile.test.sql`. `TASKS.md` registra o estado e este relatório. Gates aprovados: `npm run lint`; `npm test` (4 arquivos, 15 testes); `npm run build` (TypeScript e 17 páginas); `npx supabase db reset`; `npx supabase test db --debug` (3 arquivos, 111 assertions); `git diff --check`. Uma assertion adicional confirma que ação `NULL` é recusada pela RPC. Scope Guard: alterações primárias PRIMARY dentro de `ALLOWED_CHANGES`; nenhum item de `FORBIDDEN_CHANGES` alterado. Incidentes: nenhum. DoD atendido. Próxima dependência: TASK-005 (checkpoint PHASE-01), ainda `BLOCKED`; não iniciada.
 
 ### TASK-005 Checkpoint PHASE-01
 

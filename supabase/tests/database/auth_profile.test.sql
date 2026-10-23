@@ -1,6 +1,6 @@
 begin;
 
-select plan(11);
+select plan(12);
 
 insert into auth.users (id, email, raw_user_meta_data) values (
   '40000000-0000-4000-8000-000000000001',
@@ -51,8 +51,11 @@ select lives_ok(
   $$select public.update_customer_profile('Updated Name', '11988887777', '111.444.777-35')$$,
   'customer can update allowed profile fields through the scoped function'
 );
-update public.profiles set role = 'admin'
-where id = '40000000-0000-4000-8000-000000000001';
+select throws_ok(
+  $$update public.profiles set role = 'admin'
+    where id = '40000000-0000-4000-8000-000000000001'$$,
+  '42501', null, 'customer cannot promote their own role'
+);
 select is(
   (select role::text from public.profiles where id = '40000000-0000-4000-8000-000000000001'),
   'customer', 'customer cannot promote their own role'
