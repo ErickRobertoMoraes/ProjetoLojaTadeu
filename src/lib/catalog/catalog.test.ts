@@ -6,6 +6,8 @@ import {
   parseCatalogCategory,
   parseCatalogFilters,
   parseCatalogProduct,
+  parseCatalogVariant,
+  parseProductImageAltText,
 } from "./catalog";
 
 describe("catalog filters", () => {
@@ -61,6 +63,30 @@ describe("catalog admin input validation", () => {
       training_goal: "forca", active: true, featured: true,
     });
     expect(parseCatalogProduct({ category_id: "bad", name: "Camiseta", slug: "camiseta", description: "" })).toBeNull();
+  });
+
+  it("accepts a variant with non-negative integer price and stock", () => {
+    expect(parseCatalogVariant({
+      sku: " CAMISETA-M ", attributes: { Tamanho: " M " }, price_cents: 4990, stock: 0, active: true,
+    })).toEqual({ sku: "CAMISETA-M", attributes: { Tamanho: "M" }, price_cents: 4990, stock: 0, active: true });
+  });
+
+  it.each([
+    { sku: "", attributes: {}, price_cents: 100, stock: 1 },
+    { sku: "SKU-1", attributes: [], price_cents: 100, stock: 1 },
+    { sku: "SKU-1", attributes: { color: 7 }, price_cents: 100, stock: 1 },
+    { sku: "SKU-1", attributes: {}, price_cents: -1, stock: 1 },
+    { sku: "SKU-1", attributes: {}, price_cents: 100.1, stock: 1 },
+    { sku: "SKU-1", attributes: {}, price_cents: 100, stock: -1 },
+    { sku: "SKU-1", attributes: {}, price_cents: 100, stock: 1.5 },
+  ])("rejects invalid variant input: %j", (input) => {
+    expect(parseCatalogVariant(input)).toBeNull();
+  });
+
+  it("requires useful, bounded image alternative text", () => {
+    expect(parseProductImageAltText({ alt_text: "  Camiseta azul em tecido leve  " })).toBe("Camiseta azul em tecido leve");
+    expect(parseProductImageAltText({ alt_text: " " })).toBeNull();
+    expect(parseProductImageAltText({ alt_text: "a".repeat(241) })).toBeNull();
   });
 });
 

@@ -4,11 +4,11 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export async function listCatalogProducts(client: SupabaseClient, filters: CatalogFilters) {
   const priceFiltered = filters.minPrice !== null || filters.maxPrice !== null;
   const variantSelection = priceFiltered
-    ? "variants:product_variants!inner(price_cents, active)"
-    : "variants:product_variants(price_cents, active)";
+    ? "variants:product_variants!inner(id, sku, attributes, price_cents, stock, active)"
+    : "variants:product_variants(id, sku, attributes, price_cents, stock, active)";
   let query = client
     .from("products")
-    .select(`id, category_id, name, slug, brand, description, training_goal, active, featured, category:categories!inner(id, name, slug), ${variantSelection}`, { count: "exact" })
+    .select(`id, category_id, name, slug, brand, description, training_goal, active, featured, category:categories!inner(id, name, slug), ${variantSelection}, images:product_images(id, storage_path, alt_text, sort_order)`, { count: "exact" })
     .eq("active", true)
     .eq("category.active", true)
     .eq("variants.active", true)
