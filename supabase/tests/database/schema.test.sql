@@ -2,6 +2,29 @@ begin;
 
 select plan(86);
 
+
+create temp table task_test_cpf_reservations (cpf text primary key);
+create or replace function pg_temp.unique_test_cpf()
+returns text
+language plpgsql
+as $$
+declare
+  digits text;
+  candidate text;
+begin
+  loop
+    digits := lpad(floor(random() * 100000000000)::bigint::text, 11, '0');
+    candidate := substring(digits from 1 for 3) || '.' || substring(digits from 4 for 3) || '.' ||
+      substring(digits from 7 for 3) || '-' || substring(digits from 10 for 2);
+    if not exists (select 1 from public.profiles where cpf_formatted = candidate)
+      and not exists (select 1 from pg_temp.task_test_cpf_reservations where cpf = candidate) then
+      insert into pg_temp.task_test_cpf_reservations (cpf) values (candidate);
+      return candidate;
+    end if;
+  end loop;
+end;
+$$;
+
 select has_table('public', 'profiles', 'profiles table exists');
 select has_table('public', 'addresses', 'addresses table exists');
 select has_table('public', 'categories', 'categories table exists');
@@ -71,15 +94,15 @@ insert into public.product_variants (id, product_id, sku, price_cents, stock) va
   ('10000000-0000-4000-8000-000000000005', '10000000-0000-4000-8000-000000000004', 'SCHEMA-TEST-2', 100, 10);
 insert into auth.users (id, email, raw_user_meta_data) values
   ('20000000-0000-4000-8000-000000000001', 'task002-customer-a@example.test', jsonb_build_object(
-    'name', 'Customer A', 'phone', '11999990001', 'cpf_formatted', '529.982.247-25',
+    'name', 'Customer A', 'phone', '11999990001', 'cpf_formatted', pg_temp.unique_test_cpf(),
     'address', jsonb_build_object('postal_code', '01000-000', 'street', 'Test Street A', 'number', '1',
       'district', 'Center', 'city', 'São Paulo', 'state', 'SP', 'shipping_region', 'sp'))),
   ('20000000-0000-4000-8000-000000000002', 'task002-customer-b@example.test', jsonb_build_object(
-    'name', 'Customer B', 'phone', '11999990002', 'cpf_formatted', '111.444.777-35',
+    'name', 'Customer B', 'phone', '11999990002', 'cpf_formatted', pg_temp.unique_test_cpf(),
     'address', jsonb_build_object('postal_code', '20000-000', 'street', 'Test Street B', 'number', '2',
       'district', 'Center', 'city', 'Rio de Janeiro', 'state', 'RJ', 'shipping_region', 'southeast'))),
   ('20000000-0000-4000-8000-000000000003', 'task002-admin@example.test', jsonb_build_object(
-    'name', 'Schema admin', 'phone', '11999990003', 'cpf_formatted', '935.411.347-80',
+    'name', 'Schema admin', 'phone', '11999990003', 'cpf_formatted', pg_temp.unique_test_cpf(),
     'address', jsonb_build_object('postal_code', '01000-000', 'street', 'Admin Street', 'number', '3',
       'district', 'Center', 'city', 'São Paulo', 'state', 'SP', 'shipping_region', 'sp'),
     'role', 'admin'));
@@ -219,9 +242,14 @@ select throws_ok(
 reset role;
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '20000000-0000-4000-8000-000000000003', true);
-select is((select count(*) from public.profiles), 3::bigint, 'active admin can read profiles');
-select is((select count(*) from public.addresses), 3::bigint, 'active admin can read customer addresses');
-select is((select count(*) from public.coupons), 1::bigint, 'active admin can read coupons');
+select is((select count(*) from public.profiles
+  where id in ('20000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000002',
+    '20000000-0000-4000-8000-000000000003')), 3::bigint, 'active admin can read fixture profiles');
+select is((select count(*) from public.addresses
+  where customer_id in ('20000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000002',
+    '20000000-0000-4000-8000-000000000003')), 3::bigint, 'active admin can read fixture addresses');
+select is((select count(*) from public.coupons where code = 'TASK002-TEST'),
+  1::bigint, 'active admin can read fixture coupon');
 select lives_ok(
   $$insert into public.categories (name, slug, active)
     values ('Admin test category', 'admin-test-category', false)$$,

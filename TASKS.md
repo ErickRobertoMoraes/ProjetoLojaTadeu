@@ -12,7 +12,7 @@
 | 6 | TASK-006 | PHASE-02 | HIGH | TASK-005 | DONE |
 | 7 | TASK-007 | PHASE-02 | HIGH | TASK-006 | DONE |
 | 8 | TASK-008 | PHASE-02 | HIGH | TASK-007 | DONE |
-| 9 | TASK-009 | PHASE-02 | HIGH | TASK-008 | READY |
+| 9 | TASK-009 | PHASE-02 | HIGH | TASK-008 | DONE |
 | 10 | TASK-010 | PHASE-03 | HIGH | TASK-009 | BLOCKED |
 | 11 | TASK-011 | PHASE-03 | CRITICAL | TASK-010 | BLOCKED |
 | 12 | TASK-012 | PHASE-03 | CRITICAL | TASK-011 | BLOCKED |
@@ -229,7 +229,7 @@ Scope Guard: mudanças primárias PRIMARY dentro de `ALLOWED_CHANGES`; alteraç�
 
 ### TASK-009 Checkpoint PHASE-02
 
-**Status:** READY
+**Status:** DONE
 **Phase:** PHASE-02  
 **Priority:** HIGH  
 **Dependências:** TASK-008  
@@ -242,6 +242,10 @@ Scope Guard: mudanças primárias PRIMARY dentro de `ALLOWED_CHANGES`; alteraç�
 
 **Critérios de aceitação:** critérios da fase e acessibilidade principal aprovados.  
 **Testes necessários:** build/lint, integração e E2E de navegação administrativa/cliente.
+
+**Etapas 001–004 — prontidão e plano:** TASK-008 está `DONE` e sincronizada com `origin/feature/TASK-008-shipping-coupons` no commit `d47d0a6`; branch desta TASK: `feature/TASK-009-phase-02-checkpoint`. README, AGENTS, TASKS, ADR-001/002/003, testes e páginas/API existentes de catálogo, variantes, imagens, frete e cupom revisados. Critérios rastreados: RF-003/004/010/011/015, RN-003/006, RNF-001/005/006/010, UC-002/003/005 e PHASE-02. PRIMARY: testes e registro `TASKS.md`; INCIDENTAL somente correções pequenas diretamente necessárias; FORBIDDEN: carrinho, pedido e notificações. Nenhuma decisão arquitetural nova. Plano: unitários/regressão e testes existentes; lint, TypeScript, build e `git diff --check`; pgTAP/RLS se o daemon local estiver disponível; navegação manual cliente/admin para catálogo, detalhe/estoque/imagens, configurações de frete/cupons, proteção de rotas, responsividade e teclado. Mutações manuais usarão somente registros de teste locais e serão limpas quando aplicável.
+
+**Relatório de conclusão:** TASK-009 `DONE`, branch `feature/TASK-009-phase-02-checkpoint`; nenhum commit criado nesta etapa. Arquivos primários: `supabase/tests/database/auth_profile.test.sql`, `schema.test.sql`, `task004_roles_rls.test.sql`, `task006_catalog.test.sql`, `task007_variants_images_storage.test.sql` e este registro. Correções limitadas aos fixtures/assertions para permitir repetição segura em banco local persistente: CPF único por execução, verificações de contagem restritas aos registros do teste, produto arquivado fixture para validar leitura pública e isolamento transacional das contas admin externas no teste de último administrador; todos os arquivos pgTAP terminam com `ROLLBACK`. Gates: `npm test` (12 arquivos/77 testes), `npm run lint`, `npx tsc --noEmit`, `npx --no-install supabase test db` (5 arquivos/142 assertions), `npm run build` (URL/chave pública de demonstração local) e `git -c core.whitespace=cr-at-eol diff --check` aprovados. Validação manual cliente/admin confirmada pelo usuário como funcionando; critérios principais de catálogo, disponibilidade, frete/cupons e acessibilidade foram considerados atendidos. Scope Guard PRIMARY nos testes e documentação, sem alteração incidental de código de aplicação e sem tocar nos itens FORBIDDEN (carrinho, pedido, notificações). DoD atendido. Mudanças locais anteriores do fluxo de login e respectivo teste foram preservadas, fora do escopo e não integram o relatório/commit da TASK-009. Próxima TASK elegível: TASK-010; não iniciada, aguardando instrução explícita.
 
 ### TASK-010 Carrinho persistente
 

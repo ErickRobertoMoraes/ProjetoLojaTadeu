@@ -2,6 +2,29 @@ begin;
 
 select plan(17);
 
+
+create temp table task_test_cpf_reservations (cpf text primary key);
+create or replace function pg_temp.unique_test_cpf()
+returns text
+language plpgsql
+as $$
+declare
+  digits text;
+  candidate text;
+begin
+  loop
+    digits := lpad(floor(random() * 100000000000)::bigint::text, 11, '0');
+    candidate := substring(digits from 1 for 3) || '.' || substring(digits from 4 for 3) || '.' ||
+      substring(digits from 7 for 3) || '-' || substring(digits from 10 for 2);
+    if not exists (select 1 from public.profiles where cpf_formatted = candidate)
+      and not exists (select 1 from pg_temp.task_test_cpf_reservations where cpf = candidate) then
+      insert into pg_temp.task_test_cpf_reservations (cpf) values (candidate);
+      return candidate;
+    end if;
+  end loop;
+end;
+$$;
+
 select ok(exists (select 1 from storage.buckets where id = 'product-images' and public),
   'catalog images use a public Storage bucket');
 select is((select file_size_limit::integer from storage.buckets where id = 'product-images'),
@@ -11,11 +34,11 @@ select is((select cardinality(allowed_mime_types) from storage.buckets where id 
 
 insert into auth.users (id, email, raw_user_meta_data) values
   ('70000000-0000-4000-8000-000000000001', 'task007-admin@example.test', jsonb_build_object(
-    'name', 'Catalog Admin', 'phone', '11999990001', 'cpf_formatted', '529.982.247-25',
+    'name', 'Catalog Admin', 'phone', '11999990001', 'cpf_formatted', pg_temp.unique_test_cpf(),
     'address', jsonb_build_object('postal_code', '01001000', 'street', 'Rua Teste', 'number', '1',
       'district', 'Sé', 'city', 'São Paulo', 'state', 'SP', 'shipping_region', 'sp'), 'role', 'admin')),
   ('70000000-0000-4000-8000-000000000002', 'task007-customer@example.test', jsonb_build_object(
-    'name', 'Catalog Customer', 'phone', '11999990002', 'cpf_formatted', '111.444.777-35',
+    'name', 'Catalog Customer', 'phone', '11999990002', 'cpf_formatted', pg_temp.unique_test_cpf(),
     'address', jsonb_build_object('postal_code', '01001000', 'street', 'Rua Teste', 'number', '2',
       'district', 'Sé', 'city', 'São Paulo', 'state', 'SP', 'shipping_region', 'sp')));
 update public.profiles set role = 'admin' where id = '70000000-0000-4000-8000-000000000001';
