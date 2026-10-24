@@ -36,7 +36,25 @@ export type CatalogProduct = {
   active: boolean;
   featured: boolean;
   category: { id: string; name: string; slug: string } | null;
-  variants: { price_cents: number }[];
+  variants: CatalogVariant[];
+  images?: CatalogImage[];
+};
+
+export type CatalogVariant = {
+  id?: string;
+  product_id?: string;
+  sku: string;
+  attributes: Record<string, string>;
+  price_cents: number;
+  stock: number;
+  active: boolean;
+};
+
+export type CatalogImage = {
+  id: string;
+  storage_path: string;
+  alt_text: string;
+  sort_order: number;
 };
 
 export type CatalogCategory = { id: string; name: string; slug: string; active: boolean };
@@ -100,6 +118,29 @@ export function parseCatalogProduct(value: unknown): CatalogProductInput | null 
     active: value.active !== false,
     featured: value.featured === true,
   };
+}
+
+export function parseCatalogVariant(value: unknown): Omit<CatalogVariant, "id" | "product_id"> | null {
+  if (!isRecord(value)) return null;
+  const sku = readText(value.sku, 80);
+  const price = value.price_cents;
+  const stock = value.stock;
+  const attributes = value.attributes;
+  if (!sku || !Number.isSafeInteger(price) || (price as number) < 0 || (price as number) > 2_147_483_647) return null;
+  if (!Number.isSafeInteger(stock) || (stock as number) < 0 || (stock as number) > 2_147_483_647) return null;
+  if (!isRecord(attributes) || Object.keys(attributes).length > 20) return null;
+  const normalizedAttributes: Record<string, string> = {};
+  for (const [key, rawValue] of Object.entries(attributes)) {
+    const normalizedKey = key.trim();
+    if (!normalizedKey || normalizedKey.length > 40 || typeof rawValue !== "string" || rawValue.trim().length < 1 || rawValue.trim().length > 80) return null;
+    normalizedAttributes[normalizedKey] = rawValue.trim();
+  }
+  return { sku, attributes: normalizedAttributes, price_cents: price as number, stock: stock as number, active: value.active !== false };
+}
+
+export function parseProductImageAltText(value: unknown): string | null {
+  if (!isRecord(value)) return null;
+  return readText(value.alt_text, 240);
 }
 
 export function getCatalogOffset(page: number): number {

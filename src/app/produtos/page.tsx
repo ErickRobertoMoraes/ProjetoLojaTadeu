@@ -73,14 +73,20 @@ export default async function ProductsPage({ searchParams }: PageProps) {
                 const prices = product.variants.filter((variant) => Number.isInteger(variant.price_cents) && variant.price_cents >= 0)
                   .map((variant) => variant.price_cents);
                 const lowestPrice = prices.length ? Math.min(...prices) : null;
+                const mainImage = [...(product.images ?? [])].sort((a, b) => a.sort_order - b.sort_order)[0];
+                const imageUrl = mainImage
+                  ? supabase.storage.from("product-images").getPublicUrl(mainImage.storage_path).data.publicUrl
+                  : null;
                 return (
                   <article className="product-card" key={product.id}>
+                    {mainImage && imageUrl && <Link href={`/produtos/${product.slug}`} className="product-card-image-link"><img src={imageUrl} alt={mainImage.alt_text} /></Link>}
                     <span className="product-category">{product.category?.name ?? "FitStore"}</span>
-                    <h2>{product.name}</h2>
+                    <h2><Link href={`/produtos/${product.slug}`}>{product.name}</Link></h2>
                     {product.brand && <p className="product-brand">{product.brand}</p>}
                     {product.description && <p>{product.description}</p>}
                     {product.training_goal && <p className="product-goal">{product.training_goal}</p>}
                     <p className="product-price">{lowestPrice === null ? "Preço em breve" : `A partir de ${formatPrice(lowestPrice)}`}</p>
+                    <Link className="product-detail-link" href={`/produtos/${product.slug}`}>Ver produto</Link>
                   </article>
                 );
               })}

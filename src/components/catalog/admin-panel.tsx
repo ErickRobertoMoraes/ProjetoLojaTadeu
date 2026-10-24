@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { CatalogCategory, CatalogProduct } from "@/lib/catalog/catalog";
+import { VariantManager } from "@/components/catalog/variant-manager";
+import { ImageManager } from "@/components/catalog/image-manager";
 
 type Props = { categories: CatalogCategory[]; products: CatalogProduct[] };
 
@@ -94,6 +96,11 @@ export function CatalogAdminPanel({ categories, products }: Props) {
               <details><summary>Editar</summary>
                 <ProductForm product={product} categories={categories} onSubmit={submit} busy={busy} />
               </details>
+              <details><summary>Variações e estoque</summary><VariantManager productId={product.id} variants={product.variants ?? []} /></details>
+              <details><summary>Imagens</summary><ImageManager productId={product.id} images={(product.images ?? []).map((image) => ({
+                ...image,
+                url: "url" in image && typeof image.url === "string" ? image.url : "",
+              }))} /></details>
               {product.active && <button className="text-button" type="button" disabled={busy} onClick={() => void archiveProduct(product.id)}>Desativar</button>}
             </article>
           ))}
