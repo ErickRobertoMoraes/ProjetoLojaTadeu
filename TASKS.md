@@ -10,8 +10,8 @@
 | 4 | TASK-004 | PHASE-01 | CRITICAL | TASK-003 | DONE |
 | 5 | TASK-005 | PHASE-01 | HIGH | TASK-004 | DONE |
 | 6 | TASK-006 | PHASE-02 | HIGH | TASK-005 | DONE |
-| 7 | TASK-007 | PHASE-02 | HIGH | TASK-006 | BLOCKED |
-| 8 | TASK-008 | PHASE-02 | HIGH | TASK-007 | BLOCKED |
+| 7 | TASK-007 | PHASE-02 | HIGH | TASK-006 | DONE |
+| 8 | TASK-008 | PHASE-02 | HIGH | TASK-007 | READY |
 | 9 | TASK-009 | PHASE-02 | HIGH | TASK-008 | BLOCKED |
 | 10 | TASK-010 | PHASE-03 | HIGH | TASK-009 | BLOCKED |
 | 11 | TASK-011 | PHASE-03 | CRITICAL | TASK-010 | BLOCKED |
@@ -173,7 +173,7 @@ Scope Guard: mudanças primárias PRIMARY dentro de `ALLOWED_CHANGES`; alteraç�
 
 ### TASK-007 Variações imagens e estoque
 
-**Status:** IN_PROGRESS  
+**Status:** DONE
 **Phase:** PHASE-02  
 **Priority:** HIGH  
 **Dependências:** TASK-006  
@@ -195,7 +195,9 @@ Scope Guard: mudanças primárias PRIMARY dentro de `ALLOWED_CHANGES`; alteraç�
 
 **Etapa 006 — revisão técnica e de escopo (GATE-006 APROVADO):** revisão detectou resolução ambígua de `name` nas subconsultas das policies Storage; qualificadas as referências como `storage.objects.name`. A suíte então revelou divergência de plano pgTAP; ajustado `plan(18)` para `plan(17)`, correspondente às asserções existentes. `supabase db reset --debug` concluiu (exit 0); `supabase test db --debug` passou 5 arquivos/142 testes; `npm run lint` passou; `npm test` passou (8 arquivos/51 testes); `npm run build` passou com as variáveis públicas do Supabase local configuradas; `git -c core.whitespace=cr-at-eol diff --check -- '*.ts' '*.tsx' '*.sql' '*.toml'` passou sem apontamentos. O check geral também apontou espaços finais em Markdown, padrão de hard breaks já presente nos documentos afetados; não foram alterados para evitar normalização fora de escopo. Revisão de segurança confirmou autenticação de admin no servidor, RLS complementar, sem chave privilegiada no cliente; nenhum checkout ou baixa de estoque por pedido foi alterado. Scope Guard: PRIMARY dentro de ALLOWED_CHANGES; incidental somente a porta local do DB, necessária e localizada; FORBIDDEN_CHANGES respeitado. Nenhum commit criado.
 
-**Etapa 007 — testes manuais:** roteiro em `docs/testing/task-007-manual.md`. Tentativa de execução em 2026-10-23 criou uma conta descartável local e abriu uma vez o link de confirmação; o retorno foi `error=access_denied&error_code=otp_expired`. O estado de confirmação da conta não pôde ser consultado porque o WSL retornou `Wsl/E_ACCESSDENIED`. O token antigo não deve ser reutilizado; em outra máquina, criar conta descartável nova e seguir o roteiro. Nenhum caso manual foi aprovado: 4 pendentes; GATE-007 pendente e GATE-008 não iniciado. TASK-007 permanece `IN_PROGRESS`.
+**Etapa 007 — testes manuais (GATE-007 APROVADO):** MAN-007-01 a MAN-007-04 foram executados e aprovados pelo usuário em 2026-10-24; resultados e evidências sem dados sensíveis estão em `docs/testing/task-007-manual.md`. Confirmados: variação em estoque e sem estoque visíveis com disponibilidade correta; upload e leitura pública da imagem com alt text; SKU duplicado e preço/estoque negativos recusados; escrita anônima 401 e cliente 403. Para corrigir o ambiente local, o stack foi parado sem `--no-backup`, os dados do volume foram restaurados, e `supabase migration up --local` aplicou as migrations de TASK-006 e TASK-007; o bucket `product-images` foi verificado no Studio. GATE-006 já estava aprovado; GATE-008 (Scope Guard/DoD) aprovado após revisão final. TASK-007 `DONE`.
+
+**Relatório de conclusão:** branch `feature/TASK-007-variants-images-stock`. Arquivos primários: implementação de catálogo da etapa 005, testes unitários/API/pgTAP já listados na etapa 005, migration `20261023130000_task007_variants_images_storage.sql`, `docs/testing/task-007-manual.md` e este relatório em `TASKS.md`. Incidental: ajuste da porta local PostgreSQL em `supabase/config.toml`, pequeno e necessário para coexistir com outro projeto local. Scope Guard PRIMARY dentro de `ALLOWED_CHANGES`, incidental MINIMAL diretamente necessária, `FORBIDDEN_CHANGES` respeitado; sem checkout ou baixa de estoque por pedido. Gates: `npm run lint`, `npm test` (8 arquivos/51 testes), `npm run build`, `supabase migration up --local`, `supabase test db --debug` (5 arquivos/142 assertions), `git diff --check`, revisão GATE-006 e testes manuais GATE-007 aprovados. DoD atendido. A correção do fluxo de login autorizada pelo usuário está preservada como mudança local separada, não incluída no relatório/commit da TASK-007. Commit de encerramento registrado como `test(catalog): record TASK-007 manual validation [TASK-007]`. Próxima TASK elegível: TASK-008 `READY`, ainda não iniciada.
 
 ### TASK-008 Frete regional e cupons
 
