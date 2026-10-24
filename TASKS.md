@@ -11,8 +11,8 @@
 | 5 | TASK-005 | PHASE-01 | HIGH | TASK-004 | DONE |
 | 6 | TASK-006 | PHASE-02 | HIGH | TASK-005 | DONE |
 | 7 | TASK-007 | PHASE-02 | HIGH | TASK-006 | DONE |
-| 8 | TASK-008 | PHASE-02 | HIGH | TASK-007 | READY |
-| 9 | TASK-009 | PHASE-02 | HIGH | TASK-008 | BLOCKED |
+| 8 | TASK-008 | PHASE-02 | HIGH | TASK-007 | DONE |
+| 9 | TASK-009 | PHASE-02 | HIGH | TASK-008 | READY |
 | 10 | TASK-010 | PHASE-03 | HIGH | TASK-009 | BLOCKED |
 | 11 | TASK-011 | PHASE-03 | CRITICAL | TASK-010 | BLOCKED |
 | 12 | TASK-012 | PHASE-03 | CRITICAL | TASK-011 | BLOCKED |
@@ -201,7 +201,7 @@ Scope Guard: mudanças primárias PRIMARY dentro de `ALLOWED_CHANGES`; alteraç�
 
 ### TASK-008 Frete regional e cupons
 
-**Status:** BLOCKED  
+**Status:** DONE
 **Phase:** PHASE-02  
 **Priority:** HIGH  
 **Dependências:** TASK-007  
@@ -215,9 +215,21 @@ Scope Guard: mudanças primárias PRIMARY dentro de `ALLOWED_CHANGES`; alteraç�
 **Critérios de aceitação:** quatro faixas retornam valor/prazo; cupom percentual valida todas as regras.  
 **Testes necessários:** tabela de regiões e limites/validade/usos de cupom.
 
+**INCIDENTAL_CHANGES_POLICY:** MINIMAL_DIRECTLY_CAUSED_CHANGES_ALLOWED.
+
+**Etapas 001–004 — prontidão, histórico e plano:** TASK-007 está `DONE` no commit `10c4e5a`; branch criada a partir desse estado: `feature/TASK-008-shipping-coupons`. README, TASKS, ADR-001/002/003, schema e testes existentes revisados. O schema já contém `shipping_regions`, `coupons`, enum das quatro regiões e políticas RLS de leitura/gestão; sem mudança arquitetural necessária. Alterações PRIMARY: validação/cálculo em módulos shipping/coupons, APIs e painel administrativo de configuração, testes e este registro. Sem alterar tabelas ou regras de pedido/pagamento. Regiões usam os códigos existentes (`sp`, `southeast`, `south_center_west`, `north_northeast`); nenhum valor/prazo de frete padrão será inventado, o administrador os configura. Cupons percentuais aplicam-se ao subtotal elegível antes do frete, conforme a decomposição do total definida no modelo. Decisão explícita do usuário: desconto arredondado ao centavo mais próximo, limitado ao subtotal; intervalo de validade início inclusivo/fim exclusivo (`starts_at <= now < ends_at`). Cobertura planejada: testes unitários das quatro faixas, limites de frete e validade/valor mínimo/limite/uso/percentual/arredondamento de cupom; testes API de autenticação/autorização e validação; lint, suíte unitária, build, migrations/pgTAP e diff-check. ADR-003 define frete regional configurável; ADR-002 exige papel no servidor e RLS complementar; nenhum endpoint criará pedidos nem aprovará pagamentos.
+
+**Etapa 005 — implementação:** módulos puros de cotação de frete e validação/cálculo de cupom; APIs administrativas protegidas para listar/salvar regiões e criar/editar cupons; cotação pública por código de região configurada; painel `/admin/frete-cupons` ligado ao painel de catálogo. Datas são enviadas/persistidas em UTC e exibidas em `America/Sao_Paulo`; arredondamento percentual ao centavo mais próximo; cupom calculado sobre subtotal sem frete. Sem migration, seed ou valor de tarifa inventado; sem pedido/pagamento/consumo de cupom.
+
+**Etapa 006 — gates locais:** `npm test` passou (12 arquivos/77 testes); `npm run lint`, `npx tsc --noEmit` e `git -c core.whitespace=cr-at-eol diff --check` passaram. `npm run build` passou com a URL/chave pública de demonstração do Supabase local no ambiente do build. Docker/Supabase pgTAP não pôde ser verificado neste host: acesso ao daemon Docker retornou `permission denied` no named pipe do Docker Desktop; nenhuma migration foi criada nesta TASK. Revisão de escopo confirma alterações PRIMARY em shipping/coupons/admin settings/testes/TASKS, sem alterações de pedidos/pagamentos.
+
+**Etapa 007 — validação manual (GATE-007 APROVADO):** em 2026-10-24, o usuário confirmou que testou a configuração e as operações de frete/cupons no painel e que funcionou corretamente. Não foram alterados valores comerciais padrão; configuração de frete permaneceu a cargo do administrador.
+
+**Relatório de conclusão:** TASK-008 `DONE`, branch `feature/TASK-008-shipping-coupons`. Arquivos primários: módulos `src/lib/shipping/`, `src/lib/coupons/`, helper `src/lib/commerce/admin.ts`, APIs `src/app/api/admin/shipping-regions/`, `src/app/api/admin/coupons/` e `src/app/api/shipping/quote/`, painel `src/app/admin/frete-cupons/` e `src/components/commerce/`, link no painel de catálogo, estilos, testes e este registro. Gates: `npm test` (12 arquivos/77 testes), `npm run lint`, `npx tsc --noEmit`, `npm run build` (com URL/chave pública local de demonstração), `git -c core.whitespace=cr-at-eol diff --check` e validação manual do usuário aprovados. Nenhuma migration/schema/policy foi alterada; pgTAP não aplicável a esta TASK. O Docker Desktop do host não estava acessível ao agente (named pipe retornou `permission denied`), mas o usuário confirmou que a validação funcional no ambiente local passou. Scope Guard PRIMARY dentro de `ALLOWED_CHANGES`; sem incidental além de mudanças diretamente ligadas ao painel de configuração; `FORBIDDEN_CHANGES` respeitado: sem pedido, pagamento ou consumo de cupom. DoD e GATE-008 atendidos. Alterações locais preexistentes do fluxo de login e seu teste foram preservados fora deste commit/TASK. Próxima TASK elegível: TASK-009 `READY`, checkpoint PHASE-02; não iniciada.
+
 ### TASK-009 Checkpoint PHASE-02
 
-**Status:** BLOCKED  
+**Status:** READY
 **Phase:** PHASE-02  
 **Priority:** HIGH  
 **Dependências:** TASK-008  

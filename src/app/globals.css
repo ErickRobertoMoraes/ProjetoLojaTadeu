@@ -339,6 +339,50 @@ summary:focus-visible {
   margin: 0;
 }
 
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1rem;
+}
+
+.settings-card {
+  padding: 1rem;
+  border: 1px solid #d4ded7;
+  border-radius: 0.6rem;
+  background: #fff;
+}
+
+.settings-card h3 {
+  margin: 0;
+}
+
+.settings-card > p {
+  color: #52705d;
+}
+
+.settings-coupon-form {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  align-items: end;
+  padding: 1rem;
+  border: 1px solid #d4ded7;
+  border-radius: 0.6rem;
+  background: #fff;
+}
+
+.settings-coupon-form > button {
+  align-self: end;
+}
+
+.settings-coupon-form input[type="checkbox"] {
+  width: 1.2rem;
+  min-height: 1.2rem;
+}
+
+.settings-note {
+  color: #52705d;
+  font-size: 0.9rem;
+}
+
 .admin-section .section-heading > p {
   color: #526359;
 }
