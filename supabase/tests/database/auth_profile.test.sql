@@ -2,13 +2,36 @@ begin;
 
 select plan(12);
 
+
+create temp table task_test_cpf_reservations (cpf text primary key);
+create or replace function pg_temp.unique_test_cpf()
+returns text
+language plpgsql
+as $$
+declare
+  digits text;
+  candidate text;
+begin
+  loop
+    digits := lpad(floor(random() * 100000000000)::bigint::text, 11, '0');
+    candidate := substring(digits from 1 for 3) || '.' || substring(digits from 4 for 3) || '.' ||
+      substring(digits from 7 for 3) || '-' || substring(digits from 10 for 2);
+    if not exists (select 1 from public.profiles where cpf_formatted = candidate)
+      and not exists (select 1 from pg_temp.task_test_cpf_reservations where cpf = candidate) then
+      insert into pg_temp.task_test_cpf_reservations (cpf) values (candidate);
+      return candidate;
+    end if;
+  end loop;
+end;
+$$;
+
 insert into auth.users (id, email, raw_user_meta_data) values (
   '40000000-0000-4000-8000-000000000001',
   'task003-customer@example.test',
   jsonb_build_object(
     'name', 'Task Three Customer',
     'phone', '11999990004',
-    'cpf_formatted', '529.982.247-25',
+    'cpf_formatted', pg_temp.unique_test_cpf(),
     'role', 'admin',
     'address', jsonb_build_object(
       'postal_code', '01001000', 'street', 'Rua de Teste', 'number', '10',
@@ -17,6 +40,7 @@ insert into auth.users (id, email, raw_user_meta_data) values (
     )
   )
 );
+select set_config('task.test.updated_cpf', pg_temp.unique_test_cpf(), true);
 
 select is(
   (select role::text from public.profiles where id = '40000000-0000-4000-8000-000000000001'),
@@ -48,7 +72,7 @@ select ok(
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '40000000-0000-4000-8000-000000000001', true);
 select lives_ok(
-  $$select public.update_customer_profile('Updated Name', '11988887777', '111.444.777-35')$$,
+  $$select public.update_customer_profile('Updated Name', '11988887777', current_setting('task.test.updated_cpf'))$$,
   'customer can update allowed profile fields through the scoped function'
 );
 select throws_ok(
