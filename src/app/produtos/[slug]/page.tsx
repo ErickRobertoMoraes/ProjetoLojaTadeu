@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -30,7 +31,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
     <main className="product-detail-page">
       <header className="catalog-header">
         <Link href="/" className="brand-link">FitStore</Link>
-        <nav className="catalog-account" aria-label="Conta"><Link href="/perfil">Minha conta</Link><Link href="/entrar">Entrar</Link></nav>
+        <nav className="catalog-account" aria-label="Conta"><Link href="/carrinho">Carrinho</Link><Link href="/perfil">Minha conta</Link><Link href="/entrar">Entrar</Link></nav>
       </header>
       <nav aria-label="Trilha de navegação" className="breadcrumbs"><Link href="/produtos">Produtos</Link><span aria-hidden="true"> / </span><span>{product.name}</span></nav>
       <article className="product-detail">
@@ -55,7 +56,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 return (
                   <li key={variant.id} className={available ? "product-variant" : "product-variant unavailable"}>
                     <div><strong>{attributes.map(([key, value]) => `${key}: ${value}`).join(" · ") || variant.sku}</strong>
-                      <span>{available ? `Em estoque: ${variant.stock}` : "Indisponível no momento"}</span></div>
+                      <span>{available ? `Em estoque: ${variant.stock}` : "Indisponível no momento"}</span>
+                      <AddToCartButton variantId={variant.id} available={available} /></div>
                     <span className="product-price">{formatPrice(variant.price_cents)}</span>
                   </li>
                 );

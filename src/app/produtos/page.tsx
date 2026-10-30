@@ -27,6 +27,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       <header className="catalog-header">
         <Link href="/" className="brand-link">FitStore</Link>
         <nav className="catalog-account" aria-label="Conta">
+          <Link href="/carrinho">Carrinho</Link>
           <Link href="/perfil">Minha conta</Link>
           <Link href="/entrar">Entrar</Link>
         </nav>
