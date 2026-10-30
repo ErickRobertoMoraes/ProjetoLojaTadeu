@@ -13,7 +13,7 @@
 | 7 | TASK-007 | PHASE-02 | HIGH | TASK-006 | DONE |
 | 8 | TASK-008 | PHASE-02 | HIGH | TASK-007 | DONE |
 | 9 | TASK-009 | PHASE-02 | HIGH | TASK-008 | DONE |
-| 10 | TASK-010 | PHASE-03 | HIGH | TASK-009 | BLOCKED |
+| 10 | TASK-010 | PHASE-03 | HIGH | TASK-009 | DONE |
 | 11 | TASK-011 | PHASE-03 | CRITICAL | TASK-010 | BLOCKED |
 | 12 | TASK-012 | PHASE-03 | CRITICAL | TASK-011 | BLOCKED |
 | 13 | TASK-013 | PHASE-03 | HIGH | TASK-012 | BLOCKED |
@@ -249,7 +249,7 @@ Scope Guard: mudanças primárias PRIMARY dentro de `ALLOWED_CHANGES`; alteraç�
 
 ### TASK-010 Carrinho persistente
 
-**Status:** BLOCKED  
+**Status:** DONE  
 **Phase:** PHASE-03  
 **Priority:** HIGH  
 **Dependências:** TASK-009  
@@ -262,6 +262,12 @@ Scope Guard: mudanças primárias PRIMARY dentro de `ALLOWED_CHANGES`; alteraç�
 
 **Critérios de aceitação:** adição, remoção e ajuste respeitam disponibilidade; carrinho não acessível a outro cliente.  
 **Testes necessários:** unitário e integração RLS/API.
+
+**Etapas 001–004 — prontidão e plano:** TASK-009 está `DONE` no commit `4a37be0`; a solicitação explícita do usuário autoriza iniciar TASK-010. Branch: `feature/TASK-010-cart-persistence`. ADR-001/002 aceitos; schema existente já define `carts` e `cart_items`, unicidade por cliente/variação, quantidade positiva e RLS por titular. RF-005/RN-003 exigem limite pelo estoque disponível e indisponibilidade visível no catálogo; RNF-001/010 exige isolamento no servidor/banco e validação de entradas. PRIMARY: domínio/API/UI de carrinho, testes e este registro. FORBIDDEN: pedido, pagamento e baixa definitiva de estoque. Plano: operações autenticadas de consulta/adicionar/ajustar/remover, carregando disponibilidade e preço atuais; RLS/API testa isolamento e mutações inválidas; UI acessível integrada à navegação de produto e carrinho. Gates aplicáveis: unitários/API, lint, TypeScript, build, pgTAP/RLS local se disponível e diff-check; nenhuma migração prevista salvo necessidade diretamente dentro do escopo, que será reavaliada antes de alterar schema.
+
+**Relatório de conclusão:** TASK-010 `DONE`, branch `feature/TASK-010-cart-persistence`, nenhum commit criado. Implementados validação de entrada/estoque, APIs autenticadas de leitura, adição, ajuste e remoção de itens, controles acessíveis no detalhe do produto e página `/carrinho` com disponibilidade e subtotal. Arquivos primários: `src/lib/cart/cart.ts`, `src/lib/cart/cart.test.ts`, `src/app/api/cart/route.ts`, `src/app/api/cart/route.test.ts`, `src/app/api/cart/items/[variantId]/route.ts`, `src/components/cart/add-to-cart-button.tsx`, `src/components/cart/cart-panel.tsx`, `src/app/carrinho/page.tsx`, integração em `src/app/produtos/[slug]/page.tsx`, `src/app/produtos/page.tsx`, estilos em `src/app/globals.css` e este registro. Sem migration/schema; os testes existentes de pgTAP cobrem isolamento RLS para carts/cart_items.
+
+Gates aprovados no WSL após reinstalação das dependências Linux: `npm test` (14 arquivos/82 testes), `npm run lint`, `npx tsc --noEmit`, `npm run build` (URL e chave anon locais configuradas), `npx --no-install supabase test db` (5 arquivos/142 testes) e `git -c core.whitespace=cr-at-eol diff --check` no PowerShell. O `diff --check` no WSL reportou somente hard breaks preexistentes em `README.md` e `docs/testing/task-007-manual.md`; sem normalização documental fora do escopo. Scope Guard: alterações PRIMARY dentro de `ALLOWED_CHANGES`; nenhum pedido, pagamento ou baixa definitiva de estoque foi implementado. DoD atendido. Próxima TASK elegível: TASK-011, permanece BLOCKED até nova instrução explícita.
 
 ### TASK-011 Checkout e cotação
 
