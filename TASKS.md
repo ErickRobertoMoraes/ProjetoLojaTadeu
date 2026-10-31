@@ -271,7 +271,7 @@ Gates aprovados no WSL após reinstalação das dependências Linux: `npm test` 
 
 ### TASK-011 Checkout e cotação
 
-**Status:** BLOCKED  
+**Status:** DONE
 **Phase:** PHASE-03  
 **Priority:** CRITICAL  
 **Dependências:** TASK-010  
@@ -285,9 +285,19 @@ Gates aprovados no WSL após reinstalação das dependências Linux: `npm test` 
 **Critérios de aceitação:** cliente não confirmado não avança; total reproduz preço, desconto e frete.  
 **Testes necessários:** API de cotação, inválidos e E2E de checkout.
 
+**Etapas 001–004 — prontidão e plano:** TASK-010 está `DONE`; a solicitação explícita do usuário autoriza iniciar TASK-011. Branch `feature/TASK-011-checkout-quote`. ADR-001/002/003 aceitos; schema já contém endereço único, carrinho, regiões e cupons. PRIMARY: cotação server-side, integração de checkout/carrinho, testes e este registro. FORBIDDEN: aprovação de pagamento e alteração de estoque. Critérios: autenticação e confirmação de e-mail antes de consultar checkout; endereço cadastrado; preço/subtotal derivados do carrinho persistido; cupom validado sobre subtotal; frete calculado pela região do endereço. Nenhuma decisão arquitetural nova.
+
+**Etapa 005 — implementação:** adicionada API `POST /api/checkout/quote`, página `/checkout` e detalhamento acessível de subtotal, desconto, frete e total; o carrinho ganhou link para a cotação. A API verifica autenticação/e-mail confirmado, endereço, conteúdo/estoque/preço atuais do carrinho, validade e limites do cupom e tarifa regional ativa. Não cria pedido, não aprova pagamento, não consome cupom e não altera estoque.
+
+**Etapa 006 — gates locais:** na WSL, após a implementação e inclusão do harness E2E, `npm test` passou (15 arquivos/85 testes), `npm run lint`, `npx tsc --noEmit` e `npm run build` passaram; o build usou URL e chave pública local de demonstração. A primeira tentativa de build falhou por ausência dessas variáveis; uma repetição com a configuração local passou. `git -c core.whitespace=cr-at-eol diff --check` passou.
+
+**Etapa 007 — E2E aprovado:** Playwright/Chromium configurados no script `npm run test:e2e`. Testes executados e aprovados pelo usuário na WSL (3/3): subtotal/frete/total, bloqueio com e-mail não confirmado e recálculo após cupom. Endpoints cotados são interceptados no navegador para isolar a interface; regras server-side têm cobertura dos testes API Vitest. `npx playwright install-deps chromium` instalou dependências do navegador; um seletor ambíguo no teste foi restringido a `p[role="alert"]`.
+
+**Relatório de conclusão:** TASK-011 `DONE`, branch `feature/TASK-011-checkout-quote`, nenhum commit criado. Arquivos primários: `src/app/api/checkout/quote/route.ts`, `src/app/api/checkout/quote/route.test.ts`, `src/app/checkout/page.tsx`, `src/components/checkout/checkout-quote.tsx`, `src/components/cart/cart-panel.tsx`, `e2e/checkout.spec.ts`, `playwright.config.ts`, `package.json`, `package-lock.json`, `.gitignore` e este registro. Gates aprovados: `npm test` (15 arquivos/85 testes), `npm run lint`, `npx tsc --noEmit`, `npm run build` com configuração pública local de demonstração, `npm run test:e2e` (3/3) e `git -c core.whitespace=cr-at-eol diff --check`. Scope Guard PRIMARY; nenhuma alteração de pedido, pagamento, consumo de cupom ou estoque. DoD atendido. Próxima TASK: TASK-012 `READY`; dependência concluída, não iniciada sem nova instrução explícita.
+
 ### TASK-012 Pedido pagamento simulado e estoque atômico
 
-**Status:** BLOCKED  
+**Status:** READY
 **Phase:** PHASE-03  
 **Priority:** CRITICAL  
 **Dependências:** TASK-011  

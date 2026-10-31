@@ -81,6 +81,7 @@ export function CartPanel() {
       </ul>
       <p className="cart-subtotal"><strong>Subtotal dos itens: {money(subtotal)}</strong></p>
       <p>Frete e descontos são calculados na etapa seguinte.</p>
+      <Link href="/checkout">Continuar para o checkout</Link>
       <Link href="/produtos">Continuar comprando</Link>
     </>}
   </section>;
