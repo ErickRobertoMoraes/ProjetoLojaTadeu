@@ -14,9 +14,9 @@
 | 8 | TASK-008 | PHASE-02 | HIGH | TASK-007 | DONE |
 | 9 | TASK-009 | PHASE-02 | HIGH | TASK-008 | DONE |
 | 10 | TASK-010 | PHASE-03 | HIGH | TASK-009 | DONE |
-| 11 | TASK-011 | PHASE-03 | CRITICAL | TASK-010 | BLOCKED |
-| 12 | TASK-012 | PHASE-03 | CRITICAL | TASK-011 | BLOCKED |
-| 13 | TASK-013 | PHASE-03 | HIGH | TASK-012 | BLOCKED |
+| 11 | TASK-011 | PHASE-03 | CRITICAL | TASK-010 | DONE |
+| 12 | TASK-012 | PHASE-03 | CRITICAL | TASK-011 | DONE |
+| 13 | TASK-013 | PHASE-03 | HIGH | TASK-012 | READY |
 | 14 | TASK-014 | PHASE-04 | HIGH | TASK-013 | BLOCKED |
 | 15 | TASK-015 | PHASE-04 | HIGH | TASK-014 | BLOCKED |
 | 16 | TASK-016 | PHASE-04 | MEDIUM | TASK-015 | BLOCKED |
@@ -297,7 +297,7 @@ Gates aprovados no WSL após reinstalação das dependências Linux: `npm test` 
 
 ### TASK-012 Pedido pagamento simulado e estoque atômico
 
-**Status:** READY
+**Status:** DONE
 **Phase:** PHASE-03  
 **Priority:** CRITICAL  
 **Dependências:** TASK-011  
@@ -306,14 +306,21 @@ Gates aprovados no WSL após reinstalação das dependências Linux: `npm test` 
 **Objetivo:** Aprovar pagamento simulado, criar pedido e reduzir estoque atomicamente.
 
 **ALLOWED_CHANGES:** orders/checkout transaction, migrations/funções diretamente necessárias, testes e `TASKS.md`.  
+**INCIDENTAL_CHANGES_POLICY:** NO_INCIDENTAL_CHANGES.
 **FORBIDDEN_CHANGES:** gateway real, logística externa, cancelamento.
 
 **Critérios de aceitação:** pedido preserva snapshot; estoque não fica negativo em concorrência; cupom não excede limite.  
 **Testes necessários:** integração transacional, concorrência, API e E2E compra.
 
+**Etapas 001–004 — prontidão e plano:** TASK-011 permanece `DONE`; sua conclusão registra TASK-012 `READY`, e a autorização explícita do usuário inicia esta TASK. Branch `feature/TASK-012-simulated-payment`. README e ADR-001/002/003, schema, políticas RLS, fluxo de cotação e documentação local do Next.js Route Handlers revisados. O schema já fornece tabelas e enums de pedido/pagamento; transação será uma função PostgreSQL `SECURITY DEFINER` restrita ao usuário autenticado, com validação de perfil/e-mail, locks ordenados de carrinho/variações, snapshot de endereço/itens, débito condicionado ao estoque e incremento de cupom sob lock. PRIMARY: função/API de compra, UI de aprovação simulada, migration e testes unitários/API/pgTAP/E2E; INCIDENTAL: nenhuma; FORBIDDEN: gateway real, logística externa e cancelamento. Os três métodos (PIX, cartão e boleto) registram aprovação apenas simulada. Gates: `npm test`, lint, TypeScript, build com configuração pública local, `npm run test:e2e`, `npx --no-install supabase test db` e `git diff --check`.
+
+**Etapa 005 — implementação:** migration `20261103120000_task012_simulated_payment_atomic_order.sql` adiciona o RPC `create_simulated_order`, que valida cliente/e-mail, bloqueia carrinho/variantes em ordem estável, revalida estoque/cupom/frete, cria pedido aprovado com snapshots, debita estoque, consome cupom e limpa carrinho na mesma transação. API `POST /api/orders` valida método/cupom e delega ao RPC. Checkout oferece PIX/cartão/boleto simulados e confirma pedido sem cobrança real. PRIMARY: migration, API/teste, interface de checkout, E2E, teste pgTAP e este registro; INCIDENTAL: nenhuma.
+
+**Relatório de conclusão:** TASK-012 `DONE`, branch `feature/TASK-012-simulated-payment`, sem commit. Arquivos PRIMARY: `supabase/migrations/20261103120000_task012_simulated_payment_atomic_order.sql`, `src/app/api/orders/route.ts`, `src/app/api/orders/route.test.ts`, `src/components/checkout/checkout-quote.tsx`, `e2e/checkout.spec.ts`, `supabase/tests/database/task012_simulated_order.test.sql` e `TASKS.md`. Gates: `npm test` passou (16 arquivos/88 testes); `npm run lint`, `npx tsc --noEmit` e `npm run build` passaram; `npm run test:e2e` passou (4/4); `npx --no-install supabase migration up --local` aplicou a migration; `npx --no-install supabase test db` passou (6 arquivos/156 assertions); `git -c core.whitespace=cr-at-eol diff --check` passou no PowerShell. Em execução anterior no WSL, o diff-check sinalizou whitespace preexistente em `README.md` e `docs/testing/task-007-manual.md`; esses arquivos estão fora do escopo e não foram alterados. Scope Guard PRIMARY validado; nenhum incidental e nenhum gateway/logística/cancelamento adicionados. DoD atendido. Próxima TASK elegível: TASK-013 `READY`; não iniciada.
+
 ### TASK-013 Status cancelamento e reposição
 
-**Status:** BLOCKED  
+**Status:** READY
 **Phase:** PHASE-03  
 **Priority:** HIGH  
 **Dependências:** TASK-012  

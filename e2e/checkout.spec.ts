@@ -22,7 +22,7 @@ test("shows item subtotal, configured shipping and the recalculated total", asyn
   await expect(page.getByText(/Subtotal:.*50,00/)).toBeVisible();
   await expect(page.getByText(/Frete \(São Paulo, 3 dias\):.*7,99/)).toBeVisible();
   await expect(page.getByText(/Total cotado:.*57,99/)).toBeVisible();
-  await expect(page.getByRole("note")).toContainText("ainda não foi confirmada");
+  await expect(page.getByRole("note")).toContainText("A aprovação é simulada");
 });
 
 test("shows the confirmation requirement returned by the checkout API", async ({ page }) => {
@@ -49,4 +49,25 @@ test("re-applies a coupon and displays the updated discount and total", async ({
   await page.getByRole("button", { name: "Atualizar cotação" }).click();
   await expect(page.getByText(/Cupom FIT10:.*5,00/)).toBeVisible();
   await expect(page.getByText(/Total cotado:.*52,99/)).toBeVisible();
+});
+
+test("approves a simulated payment and confirms the order", async ({ page }) => {
+  await page.route("**/api/checkout/quote", async (route) => {
+    await route.fulfill({ status: 200, json: { quote } });
+  });
+  let submitted: { payment_method: string; coupon_code: string } | null = null;
+  await page.route("**/api/orders", async (route) => {
+    submitted = route.request().postDataJSON();
+    await route.fulfill({ status: 201, json: { order: {
+      order_id: "order-test-012", status: "payment_approved", total_cents: quote.total_cents,
+    } } });
+  });
+
+  await page.goto("/checkout");
+  await page.getByLabel("Boleto", { exact: true }).check();
+  await page.getByRole("button", { name: "Aprovar pagamento simulado" }).click();
+  await expect(page.getByRole("heading", { name: "Pagamento simulado aprovado" })).toBeVisible();
+  await expect(page.getByText(/Pedido order-test-012 confirmado/)).toBeVisible();
+  await expect(page.getByRole("note")).toContainText("Nenhuma cobrança real");
+  expect(submitted).toEqual({ payment_method: "boleto", coupon_code: "" });
 });
