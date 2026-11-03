@@ -35,6 +35,9 @@ export function CheckoutQuote() {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [paymentMethod, setPaymentMethod] = useState<"pix" | "card" | "boleto">("pix");
+  const [submitting, setSubmitting] = useState(false);
+  const [order, setOrder] = useState<{ order_id: string; total_cents: number } | null>(null);
 
   async function refresh() {
     setLoading(true);
@@ -59,6 +62,27 @@ export function CheckoutQuote() {
     }
   }
 
+  async function approvePayment() {
+    setSubmitting(true);
+    setMessage("");
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ payment_method: paymentMethod, coupon_code: couponCode }),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        setMessage(errors[result.error] ?? "Não foi possível confirmar a compra agora.");
+      } else {
+        setOrder(result.order);
+      }
+    } catch {
+      setMessage("Não foi possível conectar para confirmar a compra.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   useEffect(() => { void refresh(); }, []);
 
   return <section aria-label="Cotação do checkout">
@@ -68,6 +92,11 @@ export function CheckoutQuote() {
       <button type="submit" disabled={loading}>{loading ? "Calculando…" : "Atualizar cotação"}</button>
     </form>
     {message && <p role="alert">{message}</p>}
+    {order && <section aria-live="polite" aria-label="Pedido confirmado">
+      <h2>Pagamento simulado aprovado</h2>
+      <p>Pedido {order.order_id} confirmado no valor de {money(order.total_cents)}.</p>
+      <p role="note">Nenhuma cobrança real foi realizada.</p>
+    </section>}
     {quote && <div aria-live="polite">
       <h2>Resumo do pedido</h2>
       <p>Entrega para {quote.address.city} – {quote.address.state}, CEP {quote.address.postal_code}</p>
@@ -78,7 +107,18 @@ export function CheckoutQuote() {
       {quote.coupon && <p>Cupom {quote.coupon.code}: −{money(quote.discount_cents)}</p>}
       <p>Frete ({quote.shipping.name}, {quote.shipping.delivery_days} dias): {money(quote.shipping.price_cents)}</p>
       <p><strong>Total cotado: {money(quote.total_cents)}</strong></p>
-      <p role="note">Esta etapa apresenta uma cotação. A compra ainda não foi confirmada.</p>
+      {!order && <>
+        <fieldset>
+          <legend>Forma de pagamento simulada</legend>
+          <label><input type="radio" name="payment-method" value="pix" checked={paymentMethod === "pix"} onChange={() => setPaymentMethod("pix")} /> PIX</label>
+          <label><input type="radio" name="payment-method" value="card" checked={paymentMethod === "card"} onChange={() => setPaymentMethod("card")} /> Cartão</label>
+          <label><input type="radio" name="payment-method" value="boleto" checked={paymentMethod === "boleto"} onChange={() => setPaymentMethod("boleto")} /> Boleto</label>
+        </fieldset>
+        <p role="note">A aprovação é simulada. Nenhuma cobrança real será feita.</p>
+        <button type="button" disabled={loading || submitting} onClick={() => void approvePayment()}>
+          {submitting ? "Confirmando…" : "Aprovar pagamento simulado"}
+        </button>
+      </>}
     </div>}
   </section>;
 }
