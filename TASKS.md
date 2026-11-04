@@ -320,7 +320,7 @@ Gates aprovados no WSL após reinstalação das dependências Linux: `npm test` 
 
 ### TASK-013 Status cancelamento e reposição
 
-**Status:** READY
+**Status:** DONE
 **Phase:** PHASE-03  
 **Priority:** HIGH  
 **Dependências:** TASK-012  
@@ -333,6 +333,14 @@ Gates aprovados no WSL após reinstalação das dependências Linux: `npm test` 
 
 **Critérios de aceitação:** cliente não cancela enviado; admin só faz transições permitidas; estoque é reposto uma vez.  
 **Testes necessários:** tabela de transições e repetição concorrente de cancelamento.
+
+**Etapas 001–004 — prontidão e plano:** TASK-012 está `DONE` no commit `afaf122`; a solicitação explícita do usuário autoriza iniciar TASK-013. Branch `feature/TASK-013-order-cancellation`. ADR-001/002/003 aceitos; schema já define status de pedido, estoque, itens snapshot e auditoria. PRIMARY: transições de status, cancelamento pelo cliente/admin, reposição transacional única, auditoria relacionada, testes e este registro. FORBIDDEN: notificações, avaliações e recomendações. RF-008/RF-009 e RN-004/RN-005 exigem transições permitidas, bloqueio de cancelamento após envio e reposição única. Plano: concentrar regras e locks em RPCs PostgreSQL `SECURITY DEFINER`, expor rotas autenticadas, validar autorização no banco, registrar eventos de status/cancelamento em `audit_logs`; testar tabela de transições e repetição concorrente/idempotente. Gates aplicáveis: testes unitários/API, lint, TypeScript, build, migration/pgTAP local e diff-check.
+
+**Etapa 005 — implementação:** migration `20261104100000_task013_order_status_cancellation.sql` adiciona RPC com lock por pedido, máquina de transições restrita, cancelamento antes de envio, reposição de variantes e auditoria na mesma transação; repetições de cancelamento são idempotentes. Rotas autenticadas permitem cancelamento pelo cliente/admin e mudança de status para admin; a autorização final ocorre no RPC. Migration `20261104110000_task013_guard_order_status.sql` bloqueia alterações diretas de status, exigindo o RPC mesmo para administradores. Testes API e pgTAP cobrem validação, transições, acesso, reposição, auditoria e bloqueio de bypass. O fixture legado de `schema.test.sql` passou a usar pedido aprovado e a transição RPC. Arquivos PRIMARY: migrations, `src/app/api/orders/[id]/cancel/`, `src/app/api/orders/[id]/status/`, `supabase/tests/database/task013_order_status.test.sql`, ajuste de regressão em `supabase/tests/database/schema.test.sql` e este registro.
+
+**Relatório de conclusão:** TASK-013 `DONE`, branch `feature/TASK-013-order-cancellation`, sem commit. Arquivos PRIMARY: `supabase/migrations/20261104100000_task013_order_status_cancellation.sql`, `supabase/migrations/20261104110000_task013_guard_order_status.sql`, `src/app/api/orders/[id]/cancel/route.ts` e teste, `src/app/api/orders/[id]/status/route.ts` e teste, `supabase/tests/database/task013_order_status.test.sql`, ajuste de regressão em `supabase/tests/database/schema.test.sql` e este registro. Os RPCs serializam mudanças por lock do pedido, aplicam a máquina de estados, cancelam somente antes do envio, repõem estoque uma vez, registram auditoria e bloqueiam alterações diretas de status. Repetição idempotente e transições permitidas/negadas estão cobertas em pgTAP.
+
+Gates aprovados nas execuções WSL informadas pelo usuário: `npm test` (18 arquivos/92 testes), `npm run lint`, `npx tsc --noEmit`, `npm run build` (com URL e chave pública locais), `npx --no-install supabase migration up --local` (ambas as migrations aplicadas) e `npx --no-install supabase test db` (7 arquivos/167 assertions). Diff-check no WSL reportou hard breaks Markdown preexistentes em `README.md` e `docs/testing/task-007-manual.md`; os arquivos não foram alterados. `git -c core.whitespace=cr-at-eol diff --check` passou no PowerShell para mudanças rastreadas. Scope Guard PRIMARY dentro de `ALLOWED_CHANGES`; a mudança de `schema.test.sql` é regressão diretamente causada e permanece dentro de testes; nenhum item de `FORBIDDEN_CHANGES` foi alterado. DoD atendido. Próxima TASK no backlog: TASK-014 (Checkpoint PHASE-03), ainda marcada `BLOCKED`; não iniciada.
 
 ### TASK-014 Checkpoint PHASE-03
 

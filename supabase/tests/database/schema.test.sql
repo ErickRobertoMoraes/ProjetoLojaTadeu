@@ -120,7 +120,7 @@ insert into public.orders (
   id, customer_id, status, payment_method, subtotal_cents, shipping_cents,
   total_cents, shipping_address_snapshot, shipping_region, shipping_days_snapshot
 ) values
-  ('30000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', 'pending', 'pix', 100, 0, 100, '{}'::jsonb, 'sp', 1),
+  ('30000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', 'payment_approved', 'pix', 100, 0, 100, '{}'::jsonb, 'sp', 1),
   ('30000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000001', 'delivered', 'pix', 100, 0, 100, '{}'::jsonb, 'sp', 1),
   ('30000000-0000-4000-8000-000000000003', '20000000-0000-4000-8000-000000000002', 'delivered', 'pix', 100, 0, 100, '{}'::jsonb, 'sp', 1);
 insert into public.order_items (
@@ -189,7 +189,7 @@ select is((select count(*) from public.coupons
   where code = 'TASK002-TEST' and usage_count = 0),
   1::bigint, 'customer cannot change administrative coupons');
 select is((select count(*) from public.orders
-  where id = '30000000-0000-4000-8000-000000000001' and status = 'pending'),
+  where id = '30000000-0000-4000-8000-000000000001' and status = 'payment_approved'),
   1::bigint, 'customer cannot change administrative order status');
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '20000000-0000-4000-8000-000000000001', true);
@@ -265,8 +265,7 @@ select lives_ok(
   'active admin can update coupons'
 );
 select lives_ok(
-  $$update public.orders set status = 'preparing'
-    where id = '30000000-0000-4000-8000-000000000001'$$,
+  $$select public.transition_order_status('30000000-0000-4000-8000-000000000001', 'preparing')$$,
   'active admin can update order status'
 );
 
