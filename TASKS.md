@@ -16,8 +16,8 @@
 | 10 | TASK-010 | PHASE-03 | HIGH | TASK-009 | DONE |
 | 11 | TASK-011 | PHASE-03 | CRITICAL | TASK-010 | DONE |
 | 12 | TASK-012 | PHASE-03 | CRITICAL | TASK-011 | DONE |
-| 13 | TASK-013 | PHASE-03 | HIGH | TASK-012 | READY |
-| 14 | TASK-014 | PHASE-04 | HIGH | TASK-013 | BLOCKED |
+| 13 | TASK-013 | PHASE-03 | HIGH | TASK-012 | DONE |
+| 14 | TASK-014 | PHASE-03 | HIGH | TASK-013 | DONE |
 | 15 | TASK-015 | PHASE-04 | HIGH | TASK-014 | BLOCKED |
 | 16 | TASK-016 | PHASE-04 | MEDIUM | TASK-015 | BLOCKED |
 | 17 | TASK-017 | PHASE-04 | MEDIUM | TASK-016 | BLOCKED |
@@ -344,7 +344,7 @@ Gates aprovados nas execuções WSL informadas pelo usuário: `npm test` (18 arq
 
 ### TASK-014 Checkpoint PHASE-03
 
-**Status:** BLOCKED  
+**Status:** DONE
 **Phase:** PHASE-03  
 **Priority:** HIGH  
 **Dependências:** TASK-013  
@@ -357,6 +357,10 @@ Gates aprovados nas execuções WSL informadas pelo usuário: `npm test` (18 arq
 
 **Critérios de aceitação:** E2E compra/cancelamento passa; segurança e integridade aprovadas.  
 **Testes necessários:** build/lint, regressão, E2E e teste de autorização.
+
+**Etapas 001–004 — prontidão e plano:** TASK-013 revalidada como `DONE` no commit `0bf6299`, incorporado à `main` (`573cb7e`); status resumido corrigido. A fase da TASK-014 foi alinhada para PHASE-03, conforme título, detalhe e prompts. Branch `feature/TASK-014-checkpoint-phase-03`. Scope Guard: PRIMARY em testes/documentação/`TASKS.md`; INCIDENTAL nenhum; FORBIDDEN respeitado.
+
+**Etapas 005–008 — execução e conclusão:** `e2e/checkout.spec.ts` cobre compra simulada seguida de cancelamento; `docs/testing/task-014-manual.md` registra os quatro casos. Gates aprovados: `npm test` (17 arquivos/90 testes), lint, TypeScript, build com configuração pública local, E2E (5/5), `supabase db reset --local`, pgTAP (7 arquivos/167 testes) e `git -c core.whitespace=cr-at-eol diff --check`. Em 2026-11-09, o usuário confirmou a aprovação manual de MAN-014-01 a MAN-014-04; o roteiro registra essa confirmação sem detalhes individuais. DoD atendido; TASK-014 `DONE`. PRIMARY nos arquivos de teste/documentação e neste registro, sem incidentais ou itens FORBIDDEN. TASK-015 continua bloqueada e não foi iniciada.
 
 ### TASK-015 Administração operacional e auditoria
 

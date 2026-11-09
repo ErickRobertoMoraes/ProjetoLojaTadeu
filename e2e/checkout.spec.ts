@@ -71,3 +71,34 @@ test("approves a simulated payment and confirms the order", async ({ page }) => 
   await expect(page.getByRole("note")).toContainText("Nenhuma cobrança real");
   expect(submitted).toEqual({ payment_method: "boleto", coupon_code: "" });
 });
+
+test("completes a simulated purchase and cancels the eligible order", async ({ page }) => {
+  await page.route("**/api/checkout/quote", async (route) => {
+    await route.fulfill({ status: 200, json: { quote } });
+  });
+  await page.route("**/api/orders", async (route) => {
+    await route.fulfill({ status: 201, json: { order: {
+      order_id: "order-test-014", status: "payment_approved", total_cents: quote.total_cents,
+    } } });
+  });
+  let cancellationRequest: { method: string; url: string } | null = null;
+  await page.route("**/api/orders/order-test-014/cancel", async (route) => {
+    cancellationRequest = { method: route.request().method(), url: route.request().url() };
+    await route.fulfill({ status: 200, json: { order: { order_id: "order-test-014", status: "cancelled" } } });
+  });
+
+  await page.goto("/checkout");
+  await page.getByRole("button", { name: "Aprovar pagamento simulado" }).click();
+  await expect(page.getByText(/Pedido order-test-014 confirmado/)).toBeVisible();
+
+  const cancellation = await page.evaluate(async () => {
+    const response = await fetch("/api/orders/order-test-014/cancel", { method: "POST" });
+    return { status: response.status, body: await response.json() };
+  });
+
+  expect(cancellationRequest).toMatchObject({ method: "POST" });
+  expect(cancellation).toEqual({
+    status: 200,
+    body: { order: { order_id: "order-test-014", status: "cancelled" } },
+  });
+});
