@@ -18,7 +18,7 @@
 | 12 | TASK-012 | PHASE-03 | CRITICAL | TASK-011 | DONE |
 | 13 | TASK-013 | PHASE-03 | HIGH | TASK-012 | DONE |
 | 14 | TASK-014 | PHASE-03 | HIGH | TASK-013 | DONE |
-| 15 | TASK-015 | PHASE-04 | HIGH | TASK-014 | BLOCKED |
+| 15 | TASK-015 | PHASE-04 | HIGH | TASK-014 | DONE |
 | 16 | TASK-016 | PHASE-04 | MEDIUM | TASK-015 | BLOCKED |
 | 17 | TASK-017 | PHASE-04 | MEDIUM | TASK-016 | BLOCKED |
 | 18 | TASK-018 | PHASE-04 | HIGH | TASK-017 | BLOCKED |
@@ -364,7 +364,7 @@ Gates aprovados nas execuções WSL informadas pelo usuário: `npm test` (18 arq
 
 ### TASK-015 Administração operacional e auditoria
 
-**Status:** BLOCKED  
+**Status:** DONE
 **Phase:** PHASE-04  
 **Priority:** HIGH  
 **Dependências:** TASK-014  
@@ -377,6 +377,10 @@ Gates aprovados nas execuções WSL informadas pelo usuário: `npm test` (18 arq
 
 **Critérios de aceitação:** todas as ações críticas exigem admin e deixam log; gestão não viola invariantes.  
 **Testes necessários:** autorização, API e E2E administrativo.
+
+**Etapas 001–004 — prontidão, histórico, pré-condições e plano (2026-11-09):** Repositório confirmado na branch `feature/TASK-015-admin-audit`, criada a partir da branch limpa de TASK-014; commit de dependência `cb695c7` registra TASK-014 como DONE, satisfazendo a dependência. ADR-001/002/003 estão ACCEPTED. README confirma RF-002/RN-009 (gestão de administradores sem desativar o último), RF-008 (máquina de estados já implementada em TASK-013), RF-010/RF-015 e RF-016; nenhum conflito de requisito/ADR identificado. Baseline observada: páginas admin existentes para catálogo e frete/cupons; APIs existentes para catálogo, cupons, frete, acesso e transições de pedidos; transição de pedido já escreve auditoria atomicamente. Falta visualização/listagem administrativa de pedidos, usuários e auditoria, além de trilha para alterações administrativas de catálogo/estoque, cupons, frete e papéis. Plano: (PRIMARY) migration de auditoria por triggers para catálogo/estoque, cupons/frete e registro atômico no RPC de acesso; APIs admin para lista paginada/filtrável de pedidos, usuários e logs; página administrativa agregando essas operações e links para áreas existentes; testes de APIs, autorização, pgTAP e E2E/roteiro manual. (INCIDENTAL) documentação de roteiro manual e este registro. (FORBIDDEN) não alterar regras/transições de pedido, gateway real, ou incluir PII nos metadados de auditoria. Arquitetura permanece Next.js Route Handlers/serviços + Supabase RLS; impacto de schema fica restrito à auditoria e coberto em banco local; rollback é remover a migration/rotas/componentes da branch sem aplicar em produção. Gate-001 aprovado pela inspeção/documentação e estado Git; Gate-002 aprovado pelos requisitos/ADRs e histórico acima; Gate-003 aprovado pois a dependência e baseline estão verificadas e sem decisão pendente; Gate-004 aprovado por este plano revisável. Gates concluídos: 4/8. Nenhum teste de implementação ainda executado.
+
+**Etapas 005–008 — implementação, revisão, validação manual e conclusão (2026-11-09):** Arquivos primários: `supabase/migrations/20261109120000_task015_admin_audit.sql`, APIs `src/app/api/admin/orders/`, `src/app/api/admin/users/`, `src/app/api/admin/audit-logs/`, página `src/app/admin/operacao/`, `src/components/commerce/admin-operations-panel.tsx`, navegação/estilos, testes de API/E2E/pgTAP e este registro. Incidental: `docs/testing/task-015-manual.md`. Quality gates em WSL: `npm test` passou (20 arquivos/96 testes); `npm run lint`; `npx tsc --noEmit`; `npm run build`; `supabase db reset --local`; `supabase test db` passou (8 arquivos/173 testes); `npm run test:e2e` passou (6/6); `git -c core.whitespace=cr-at-eol diff --check` passou. pgTAP teve duas asserções corrigidas uma vez antes de passar. E2E precisou da instalação do Chromium e bibliotecas de sistema; depois passou sem mudanças de código. `npm ci` reportou avisos de engine para Node 20 e 7 vulnerabilidades moderadas, sem falhar os gates. Em 2026-11-09 o responsável confirmou que validou MAN-015-01 a MAN-015-06; o roteiro registra aprovação dos seis casos sem resultados individuais inventados. Gates 001–008 aprovados. Revisão técnica: acesso admin validado nas APIs, auditoria transacional, metadados mínimos sem PII, invariantes de último administrador cobertos e transições de pedidos preservadas. Scope Guard: PRIMARY dentro de `ALLOWED_CHANGES`; documentação manual é incidental e diretamente necessária; nenhuma regra de pedido ou gateway real alterado. DoD atendido; TASK-015 `DONE`. Próxima TASK elegível: TASK-016, permanece BLOCKED e não iniciada.
 
 ### TASK-016 Notificações e avaliações
 

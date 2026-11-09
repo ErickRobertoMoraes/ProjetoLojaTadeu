@@ -37,6 +37,7 @@ export default async function AdminCatalogPage() {
       <p className="eyebrow">Painel administrativo</p>
       <h1>Gerenciar catálogo</h1>
       <p>Cadastre e organize categorias, produtos, variações, imagens e estoque.</p>
+      <p><Link href="/admin/operacao" className="brand-link">Operação e auditoria</Link></p>
       <p><Link href="/admin/frete-cupons" className="brand-link">Configurar frete e cupons</Link></p>
       <CatalogAdminPanel
         categories={(categoryResult.data ?? []) as CatalogCategory[]}

@@ -32,6 +32,7 @@ export default async function ShippingCouponsAdminPage() {
   return (
     <main className="admin-page">
       <Link href="/admin/catalogo" className="brand-link">Voltar ao catálogo</Link>
+      <p><Link href="/admin/operacao" className="brand-link">Operação e auditoria</Link></p>
       <p className="eyebrow">Painel administrativo</p>
       <h1>Frete e cupons</h1>
       <p>Configure os valores e prazos das quatro regiões e gerencie cupons percentuais.</p>
