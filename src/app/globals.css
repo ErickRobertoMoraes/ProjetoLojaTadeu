@@ -323,6 +323,97 @@ summary:focus-visible {
   max-width: 70ch;
 }
 
+.admin-operations {
+  display: grid;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.admin-operations section {
+  min-width: 0;
+  padding: 1.25rem;
+  border: 1px solid #d7dfd9;
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+.admin-operations h2 {
+  margin: 0 0 1rem;
+}
+
+.admin-operations-links,
+.admin-operations-action {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.admin-operations-scroll {
+  overflow-x: auto;
+}
+
+.admin-operations table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-operations th,
+.admin-operations td {
+  min-width: 7rem;
+  padding: 0.7rem;
+  border-bottom: 1px solid #e2e8e3;
+  vertical-align: top;
+}
+
+.admin-operations td small {
+  display: block;
+  margin-top: 0.25rem;
+  color: #536259;
+}
+
+.admin-operations td code {
+  display: block;
+  max-width: 24rem;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.admin-operations button,
+.admin-operations select {
+  min-height: 2.5rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid #aab8ae;
+  border-radius: 0.35rem;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+.admin-operations button {
+  border: 0;
+  background: #176b45;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-operations button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
 .admin-catalog-content {
   display: grid;
   gap: 2rem;
