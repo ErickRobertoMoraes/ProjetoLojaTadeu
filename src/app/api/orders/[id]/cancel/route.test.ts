@@ -1,14 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "./route";
 
-const mocks = vi.hoisted(() => ({ rpc: vi.fn() }));
+const mocks = vi.hoisted(() => ({ rpc: vi.fn(), requestEmail: vi.fn(), getUserById: vi.fn(), maybeSingle: vi.fn(), eq: vi.fn() }));
 vi.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: vi.fn(async () => ({ rpc: mocks.rpc })),
+}));
+vi.mock("@/lib/supabase/admin", () => ({ createSupabaseAdminClient: () => ({
+  from: () => ({ select: () => ({ eq: mocks.eq }) }),
+  auth: { admin: { getUserById: mocks.getUserById } },
+}) }));
+vi.mock("@/lib/notifications/email", () => ({
+  orderEmail: (to: string, orderId: string, status: string, event: string) => ({ to, orderId, status, event }),
+  requestEmail: mocks.requestEmail,
 }));
 
 describe("POST /api/orders/[id]/cancel", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.requestEmail.mockResolvedValue(undefined);
+    mocks.eq.mockReturnValue({ maybeSingle: mocks.maybeSingle });
+    mocks.maybeSingle.mockResolvedValue({ data: { customer_id: "customer" }, error: null });
+    mocks.getUserById.mockResolvedValue({ data: { user: { email: "customer@example.test" } }, error: null });
     mocks.rpc.mockResolvedValue({ data: { order_id: "order-1", status: "cancelled" }, error: null });
   });
 
@@ -18,6 +30,9 @@ describe("POST /api/orders/[id]/cancel", () => {
     });
     expect(response.status).toBe(200);
     expect(mocks.rpc).toHaveBeenCalledWith("transition_order_status", { p_order_id: "order-1", p_status: "cancelled" });
+    expect(mocks.requestEmail).toHaveBeenCalledWith({
+      to: "customer@example.test", orderId: "order-1", status: "cancelled", event: "order.cancelled",
+    });
   });
 
   it("returns a conflict when an order is no longer cancellable", async () => {

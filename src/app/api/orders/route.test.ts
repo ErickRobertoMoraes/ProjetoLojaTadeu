@@ -1,9 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "./route";
 
-const mocks = vi.hoisted(() => ({ getUser: vi.fn(), rpc: vi.fn() }));
+const mocks = vi.hoisted(() => ({ getUser: vi.fn(), rpc: vi.fn(), requestEmail: vi.fn() }));
 vi.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: vi.fn(async () => ({ auth: { getUser: mocks.getUser }, rpc: mocks.rpc })),
+}));
+vi.mock("@/lib/notifications/email", () => ({
+  orderEmail: (to: string, orderId: string, status: string, event: string) => ({ to, orderId, status, event }),
+  requestEmail: mocks.requestEmail,
 }));
 
 function makeRequest(body: unknown = { payment_method: "pix" }) {
@@ -15,7 +19,10 @@ function makeRequest(body: unknown = { payment_method: "pix" }) {
 describe("POST /api/orders", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.getUser.mockResolvedValue({ data: { user: { id: "customer", email_confirmed_at: "2026-10-01T00:00:00Z" } } });
+    mocks.requestEmail.mockResolvedValue(undefined);
+    mocks.getUser.mockResolvedValue({ data: { user: {
+      id: "customer", email: "customer@example.test", email_confirmed_at: "2026-10-01T00:00:00Z",
+    } } });
     mocks.rpc.mockResolvedValue({ data: { order_id: "order-1", status: "payment_approved", total_cents: 5799 }, error: null });
   });
 
@@ -35,6 +42,9 @@ describe("POST /api/orders", () => {
       p_payment_method: "pix", p_coupon_code: "FIT10",
     });
     expect(await response.json()).toMatchObject({ order: { status: "payment_approved", total_cents: 5799 } });
+    expect(mocks.requestEmail).toHaveBeenCalledWith({
+      to: "customer@example.test", orderId: "order-1", status: "payment_approved", event: "order.created",
+    });
   });
 
   it("returns transaction conflicts without exposing database details", async () => {

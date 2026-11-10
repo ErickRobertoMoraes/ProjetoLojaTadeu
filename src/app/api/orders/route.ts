@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireConfirmedEmailForCheckout } from "@/lib/identity/authorization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { orderEmail, requestEmail } from "@/lib/notifications/email";
 
 const paymentMethods = new Set(["pix", "card", "boleto"]);
 const domainErrors: Record<string, number> = {
@@ -26,6 +27,7 @@ export async function POST(request: Request) {
     if (!authorization.allowed) {
       return NextResponse.json({ error: authorization.reason }, { status: authorization.reason === "unauthenticated" ? 401 : 403 });
     }
+    const { data: authData } = await supabase.auth.getUser();
 
     let body: unknown;
     try { body = await request.json(); } catch { return NextResponse.json({ error: "validation_failed" }, { status: 400 }); }
@@ -47,6 +49,9 @@ export async function POST(request: Request) {
       const code = error.message;
       const status = domainErrors[code] ?? (error.code === "42501" ? 403 : 503);
       return NextResponse.json({ error: domainErrors[code] ? code : status === 503 ? "order_unavailable" : "checkout_forbidden" }, { status });
+    }
+    if (authData.user?.email && typeof data?.order_id === "string") {
+      await requestEmail(orderEmail(authData.user.email, data.order_id, "payment_approved", "order.created"));
     }
     return NextResponse.json({ order: data }, { status: 201 });
   } catch {
