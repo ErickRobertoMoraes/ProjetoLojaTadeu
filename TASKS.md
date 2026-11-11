@@ -20,7 +20,7 @@
 | 14 | TASK-014 | PHASE-03 | HIGH | TASK-013 | DONE |
 | 15 | TASK-015 | PHASE-04 | HIGH | TASK-014 | DONE |
 | 16 | TASK-016 | PHASE-04 | MEDIUM | TASK-015 | DONE |
-| 17 | TASK-017 | PHASE-04 | MEDIUM | TASK-016 | BLOCKED |
+| 17 | TASK-017 | PHASE-04 | MEDIUM | TASK-016 | DONE |
 | 18 | TASK-018 | PHASE-04 | HIGH | TASK-017 | BLOCKED |
 
 ## Convenções comuns
@@ -408,7 +408,8 @@ Gates aprovados nas execuções WSL informadas pelo usuário: `npm test` (18 arq
 
 ### TASK-017 Recomendações explicáveis
 
-**Status:** BLOCKED  
+**Status:** DONE
+
 **Phase:** PHASE-04  
 **Priority:** MEDIUM  
 **Dependências:** TASK-016  
@@ -417,10 +418,18 @@ Gates aprovados nas execuções WSL informadas pelo usuário: `npm test` (18 arq
 **Objetivo:** Registrar eventos e recomendar itens por navegação, compra, categoria e objetivo.
 
 **ALLOWED_CHANGES:** engagement/recommendations, eventos, testes e `TASKS.md`.  
+**INCIDENTAL_CHANGES_POLICY:** MINIMAL_DIRECTLY_CAUSED_CHANGES_ALLOWED. Nenhum arquivo incidental previsto.
+
 **FORBIDDEN_CHANGES:** IA externa, coleta de dados fora do especificado.
 
-**Critérios de aceitação:** recomendação expõe motivo e não revela dados de outro usuário.  
-**Testes necessários:** ranking determinístico, autorização e fallback sem histórico.
+**Critérios de aceitação:** recomendações usam apenas visualizações e compras do próprio cliente, categorias selecionadas e objetivos de treino associados aos produtos; ranking é determinístico; cada sugestão inclui motivo simples; fallback determinístico exibe produtos ativos/em estoque sem histórico; respostas não incluem nem dependem de dados de outro cliente. Eventos de navegação são gravados apenas para sessão autenticada e ficam vinculados ao próprio usuário.
+**Testes necessários:** ranking determinístico e motivos por visualização/compra/categoria/objetivo, filtro de produto indisponível, fallback sem histórico, autorização (401 sem sessão; isolamento entre usuários) e persistência/RLS de eventos.
+
+**Etapas 001–004 — prontidão e início (2026-11-11):** TASK-016 `DONE` no commit `0c55676`, incorporado em `main`; dependência satisfeita. README e ADR-001/002 revisados; RF-013/RN-008 autorizam sinais internos de navegação, compra, categoria e objetivo, com motivo simples. A tabela `browsing_events` já existe com RLS por titular; ampliar somente os campos/eventos necessários para categoria/objetivo, sem armazenar texto livre de busca ou dados externos. APIs Route Handlers e páginas de catálogo permanecem no padrão Next.js 16 documentado em `node_modules/next/dist/docs/`. Branch `feature/TASK-017-explainable-recommendations`. PRIMARY: serviço determinístico de ranking, API autenticada de recomendações e eventos, registro de visualização/categoria/objetivo, apresentação das sugestões, testes e migrations/RLS se necessárias. INCIDENTAL: nenhuma prevista. FORBIDDEN: IA externa e coleta fora dos sinais especificados. Gates previstos: `npm test`, lint, TypeScript, build, E2E, reset/pgTAP local e diff-check.
+
+**Etapa 005 — implementação (2026-11-11):** migration adiciona sinais estruturados de categoria/objetivo e tipo `goal`, preservando RLS de titular; API autenticada grava visualização/categoria/objetivo com `customer_id` derivado da sessão; API e página de recomendações usam apenas histórico do titular, compras não canceladas, candidatos ativos com estoque, ranking determinístico e motivo por sugestão; fallback inclui catálogo ativo com estoque. PRIMARY em código, migration, testes e este registro; nenhum incidental.
+
+**Relatório de conclusão:** TASK-017 `DONE`, branch `feature/TASK-017-explainable-recommendations`. PRIMARY: migration `supabase/migrations/20261111120000_task017_explainable_recommendations.sql`; `src/lib/recommendations/` (ranking, consultas e testes); APIs/testes de browsing events e recommendations; `src/components/recommendations/browsing-event-tracker.tsx`; página `/recomendacoes`; integração com detalhe/catálogo/home e estilos; teste pgTAP e este registro. INCIDENTAL: nenhuma. Gates no WSL com Node 20.20.2: `npm test` passou (26 arquivos/114 testes), lint, TypeScript, build com configuração pública local e E2E (6/6); `npx --no-install supabase db reset --local` aplicou a migration; `npx --no-install supabase test db` passou (9 arquivos/178 testes); `git -c core.autocrlf=true -c core.whitespace=cr-at-eol diff --check` passou. `npm ci` reportou avisos de engine para Node 20 e 7 vulnerabilidades moderadas; o build passou com avisos de depreciação de Node 20 do Supabase. Scope Guard PRIMARY validado; nenhum incidental ou item FORBIDDEN. DoD atendido. Próxima TASK: TASK-018 permanece `BLOCKED` no backlog; não iniciada.
 
 ### TASK-018 Checkpoint PHASE-04 e entrega
 
