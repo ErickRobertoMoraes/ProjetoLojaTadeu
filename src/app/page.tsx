@@ -15,6 +15,7 @@ export default function HomePage() {
         </nav>
       </section>
       <nav className="home-links" aria-label="Acesso à conta">
+        <Link href="/recomendacoes">Minhas recomendações</Link>
         <Link href="/cadastro">Criar conta</Link>
         <Link href="/entrar">Entrar</Link>
       </nav>

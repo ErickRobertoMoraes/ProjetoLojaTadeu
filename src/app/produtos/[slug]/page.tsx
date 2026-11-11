@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
+import { BrowsingEventTracker } from "@/components/recommendations/browsing-event-tracker";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -34,6 +35,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
         <nav className="catalog-account" aria-label="Conta"><Link href="/carrinho">Carrinho</Link><Link href="/perfil">Minha conta</Link><Link href="/entrar">Entrar</Link></nav>
       </header>
       <nav aria-label="Trilha de navegação" className="breadcrumbs"><Link href="/produtos">Produtos</Link><span aria-hidden="true"> / </span><span>{product.name}</span></nav>
+      <BrowsingEventTracker productId={product.id} />
       <article className="product-detail">
         <section className="product-detail-gallery" aria-label="Imagens do produto">
           {images.length ? images.map((image) => (

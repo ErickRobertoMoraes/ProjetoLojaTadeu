@@ -841,6 +841,17 @@ summary:focus-visible {
   width: fit-content;
 }
 
+.recommendations-page {
+  width: min(72rem, calc(100% - 2rem));
+  margin-inline: auto;
+  padding-block: 1rem 3rem;
+}
+
+.recommendation-reason {
+  color: #405b52;
+  font-size: 0.95rem;
+}
+
 @media (max-width: 760px) {
   .catalog-filters,
   .catalog-admin-form,

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { parseCatalogFilters, CATALOG_PAGE_SIZE } from "@/lib/catalog/catalog";
 import { listCatalogProducts } from "@/lib/catalog/queries";
+import { BrowsingEventTracker } from "@/components/recommendations/browsing-event-tracker";
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -29,9 +30,12 @@ export default async function ProductsPage({ searchParams }: PageProps) {
         <nav className="catalog-account" aria-label="Conta">
           <Link href="/carrinho">Carrinho</Link>
           <Link href="/perfil">Minha conta</Link>
+          <Link href="/recomendacoes">Recomendações</Link>
           <Link href="/entrar">Entrar</Link>
         </nav>
       </header>
+      {filters?.category && <BrowsingEventTracker categoryId={categories?.find((item) => item.slug === filters.category)?.id} />}
+      {filters?.objective && <BrowsingEventTracker trainingGoal={filters.objective} />}
       <section className="catalog-intro">
         <p className="eyebrow">FitStore · movimento para todos os dias</p>
         <h1>Encontre seu próximo treino</h1>
