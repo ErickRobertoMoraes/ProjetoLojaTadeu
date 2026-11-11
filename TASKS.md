@@ -19,7 +19,7 @@
 | 13 | TASK-013 | PHASE-03 | HIGH | TASK-012 | DONE |
 | 14 | TASK-014 | PHASE-03 | HIGH | TASK-013 | DONE |
 | 15 | TASK-015 | PHASE-04 | HIGH | TASK-014 | DONE |
-| 16 | TASK-016 | PHASE-04 | MEDIUM | TASK-015 | BLOCKED |
+| 16 | TASK-016 | PHASE-04 | MEDIUM | TASK-015 | DONE |
 | 17 | TASK-017 | PHASE-04 | MEDIUM | TASK-016 | BLOCKED |
 | 18 | TASK-018 | PHASE-04 | HIGH | TASK-017 | BLOCKED |
 
@@ -384,7 +384,7 @@ Gates aprovados nas execuções WSL informadas pelo usuário: `npm test` (18 arq
 
 ### TASK-016 Notificações e avaliações
 
-**Status:** BLOCKED  
+**Status:** DONE
 **Phase:** PHASE-04  
 **Priority:** MEDIUM  
 **Dependências:** TASK-015  
@@ -397,6 +397,14 @@ Gates aprovados nas execuções WSL informadas pelo usuário: `npm test` (18 arq
 
 **Critérios de aceitação:** e-mails previstos são solicitados nos eventos corretos; uma avaliação por cliente/produto entregue.  
 **Testes necessários:** testes com adaptador de e-mail e elegibilidade de avaliação.
+
+**Etapas 001–004 — prontidão e plano (2026-11-10):** TASK-015 está `DONE` no commit `f16462a`, incorporado a `main`; dependência satisfeita. Solicitação explícita do usuário autoriza iniciar TASK-016. README e ADR-002 revisados: confirmação/recuperação continuam a cargo do Supabase Auth já existente; notificações de pedido criado, mudança de status e cancelamento devem ser solicitadas após a mudança persistida; reviews exigem pedido entregue, produto comprado e unicidade por cliente/produto. Schema e migrations existentes já têm `reviews`, unicidade e política de elegibilidade segura. Código de Route Handlers e documentação instalada do Next.js 16 revisados. Branch `feature/TASK-016-notifications-reviews`. (PRIMARY) adaptador de e-mail transacional injetável e disparos para eventos de pedido; rota e interface de avaliações elegíveis; testes unitários/API, E2E/pgTAP se a proteção de banco exigir alteração, e este registro. (INCIDENTAL) roteiro/manual da TASK-016 e `.env.example` sem segredos para habilitar a validação. (FORBIDDEN) recomendação, alterações em Auth, gateway real e mudanças de regras de pedido. Supabase segue responsável por Auth; o transporte transacional usa endpoint HTTP configurável com credenciais exclusivas do servidor. Gates previstos: `npm test`, `npm run lint`, `npx tsc --noEmit`, `npm run build`, `npm run test:e2e`, `npx --no-install supabase db reset --local`, `npx --no-install supabase test db` e `git -c core.whitespace=cr-at-eol diff --check`.
+
+**Etapa 005 — implementação:** adaptador server-side e solicitações nos eventos de pedido criado, transição efetiva de status e cancelamento; consulta de destinatário feita com chave privilegiada apenas no servidor. Rota de avaliação valida formato e usa RLS/índice único do banco como autoridade para elegibilidade e duplicidade; `/avaliacoes` lista produtos elegíveis de pedidos entregues do próprio cliente. Confirmação/recuperação Auth preservadas. `.env.example` e roteiro manual descrevem configuração e validações.
+
+**Etapa 006 — gates locais (2026-11-10):** `npm ci` concluiu em WSL com avisos de engine (Node 20.20.2; dependências atuais recomendam Node 22+) e 7 vulnerabilidades moderadas reportadas pelo npm. Após corrigir o e-mail no fixture: `npm test` passou (22 arquivos/102 testes), `npm run lint` passou, `npx tsc --noEmit` passou e `npm run build` passou com URL/chave pública local de demonstração. `npm run test:e2e` passou (6/6); `npx --no-install supabase db reset --local` passou e `npx --no-install supabase test db` passou (8 arquivos/173 assertions). `git -c core.whitespace=cr-at-eol diff --check` reportou espaços finais em `README.md` e `docs/testing/task-007-manual.md`, fora das alterações da TASK-016 e já identificados no histórico; não foram modificados para respeitar o Scope Guard. Build produziu avisos de suporte de Node 20 pelo Supabase, sem falhar.
+
+**Relatório de conclusão:** TASK-016 `DONE`, branch `feature/TASK-016-notifications-reviews`, sem commit. Arquivos PRIMARY: `src/lib/notifications/email.ts` e teste; `src/lib/supabase/admin.ts`; rotas/testes de pedido; `src/app/api/reviews/route.ts` e teste; `src/app/avaliacoes/page.tsx`; `src/components/reviews/review-form.tsx`; link em `src/app/perfil/page.tsx`; estilos em `src/app/globals.css`; este registro. INCIDENTAL: `.env.example` sem segredo e `docs/testing/task-016-manual.md`. Nenhuma migration necessária: elegibilidade e unicidade das avaliações já eram aplicadas pelo schema/RLS e verificadas em pgTAP. Scope Guard PRIMARY dentro de `ALLOWED_CHANGES`; incidentais pequenas e necessárias; nenhuma regra de Auth, recomendação ou pedido foi alterada. DoD atendido com os gates acima, registrando à parte os avisos de Node/npm e os espaços finais preexistentes fora do escopo. Próxima TASK elegível: TASK-017 `BLOCKED` no índice, dependente desta conclusão; não iniciada.
 
 ### TASK-017 Recomendações explicáveis
 

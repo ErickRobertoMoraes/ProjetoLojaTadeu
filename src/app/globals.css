@@ -575,6 +575,51 @@ summary:focus-visible {
   font-weight: 700;
 }
 
+.reviews-page {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.review-list {
+  display: grid;
+  gap: 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.review-list > li,
+.review-form {
+  display: grid;
+  gap: 10px;
+}
+
+.review-list > li {
+  padding: 20px;
+  border: 1px solid #d6dce4;
+  border-radius: 12px;
+}
+
+.review-form textarea,
+.review-form select {
+  max-width: 100%;
+  padding: 10px;
+  border: 1px solid #8995a5;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.review-form button {
+  justify-self: start;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 6px;
+  background: #142b4a;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
 .product-detail-page {
   width: min(100% - 2rem, 78rem);
   padding-block: 1.5rem 4rem;

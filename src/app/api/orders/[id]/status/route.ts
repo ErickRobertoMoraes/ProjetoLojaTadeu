@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { orderEmail, requestEmail } from "@/lib/notifications/email";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 const allowedStatuses = new Set(["preparing", "shipped", "delivered", "cancelled"]);
 const errorStatuses: Record<string, number> = {
@@ -29,8 +31,24 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       const status = errorStatuses[error.message] ?? (error.code === "42501" ? 403 : error.code === "22023" ? 400 : 503);
       return NextResponse.json({ error: errorStatuses[error.message] ? error.message : status === 503 ? "order_status_unavailable" : error.message }, { status });
     }
+    if (!data?.unchanged) await notifyOrderCustomer(id, String(data?.status ?? ""));
     return NextResponse.json({ order: data });
   } catch {
     return NextResponse.json({ error: "order_status_unavailable" }, { status: 503 });
+  }
+}
+
+async function notifyOrderCustomer(orderId: string, status: string) {
+  try {
+    const admin = createSupabaseAdminClient();
+    if (!admin) return;
+    const { data } = await admin.from("orders").select("customer_id").eq("id", orderId).maybeSingle();
+    if (!data) return;
+    const { data: customer } = await admin.auth.admin.getUserById(data.customer_id);
+    if (!customer.user?.email) return;
+    const event = status === "cancelled" ? "order.cancelled" : "order.status_changed";
+    await requestEmail(orderEmail(customer.user.email, orderId, status, event));
+  } catch {
+    // The committed status is authoritative even if recipient lookup or delivery is unavailable.
   }
 }

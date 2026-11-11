@@ -34,6 +34,7 @@ export default async function ProfilePage() {
       <Link href="/">FitStore</Link>
       <h1>Meu perfil</h1>
       <p>Conta: {user.email}</p>
+      <p><Link href="/avaliacoes">Avaliar compras entregues</Link></p>
       <ProfileForm profile={profile} address={address} />
     </main>
   );
