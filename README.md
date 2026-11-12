@@ -161,13 +161,14 @@ Erros de domínio retornam respostas previsíveis; erros inesperados são logado
 | Método e rota | Finalidade | Autorizado | RF/UC |
 |---|---|---|---|
 | GET /api/products | Lista e filtra catálogo paginado | Público | RF-003, UC-002 |
-| GET /api/products/:slug | Detalha produto e registra visualização autenticada | Público/Cliente | RF-004, RF-013 |
+| GET /api/products/:slug | Detalha produto | Público/Cliente | RF-004 |
+| POST /api/browsing-events | Registra visualização, categoria ou objetivo da sessão autenticada | Cliente | RF-013, UC-002 |
 | GET/PUT /api/cart | Consulta e altera carrinho | Cliente | RF-005, UC-003 |
 | POST /api/checkout/quote | Calcula frete e valida cupom | Cliente confirmado | RF-006, RF-011 |
 | POST /api/orders | Aprova pagamento simulado e cria pedido | Cliente confirmado | RF-007, UC-003 |
 | GET /api/orders e /:id | Histórico/detalhe do próprio pedido | Cliente | RF-008, UC-004 |
 | POST /api/orders/:id/cancel | Cancela pedido elegível | Cliente/Admin | RF-009, UC-004 |
-| POST /api/products/:id/reviews | Cria avaliação elegível | Cliente | RF-012, UC-007 |
+| POST /api/reviews | Cria avaliação elegível | Cliente | RF-012, UC-007 |
 | GET /api/recommendations | Obtém sugestões explicáveis | Cliente | RF-013, UC-002 |
 | /api/admin/* | Catálogo, pedidos, frete, cupons e usuários | Administrador | RF-002, RF-010, RF-015, UC-005, UC-006, UC-008 |
 
@@ -226,8 +227,10 @@ Supabase Auth gerencia credenciais, verificação e recuperação. A aplicação
 | RF-005 a 007 | RN-002 a 006 | RNF-004,008,010 | UC-003 | carts, orders, items, coupons | cart/checkout/orders | integração transação/E2E compra | TASK-009 a 012 |
 | RF-011 | RN-006 | RNF-010 | UC-003 | coupons | admin/coupons, checkout/quote | regras de validade, mínimo, limite e autorização | TASK-008,011 |
 | RF-008,009 | RN-004,005 | RNF-004,007 | UC-004,006 | orders, audit_logs | orders/admin orders | unit/API/E2E status | TASK-012,013 |
-| RF-010,015,016 | RN-009 | RNF-001,007 | UC-005,008 | catálogo, regiões, audit | admin | API autorização | TASK-008,014 |
-| RF-012,013,014 | RN-007,008 | RNF-001,007 | UC-007 | reviews, events | reviews/recommendations | unit/API/E2E | TASK-015 a 017 |
+| RF-010,015,016 | RN-009 | RNF-001,007 | UC-005,006,008 | catálogo, regiões, audit_logs | admin | API autorizada, auditoria e E2E administrativo | TASK-008,014,015 |
+| RF-012 | RN-007 | RNF-001,005,010 | UC-007 | reviews, favorites | `/api/reviews`; favorites UI/API pendentes (PD-005) | API/pgTAP elegibilidade e unicidade; teste de favoritos pendente | TASK-016; PD-005 |
+| RF-013 | RN-008 | RNF-001,007 | UC-002 | products, browsing_events | `/api/browsing-events`, `/api/recommendations` | unit/API/RLS/pgTAP/E2E | TASK-017 |
+| RF-014 | — | RNF-007 | UC-001,003,004,006 | Auth, orders, notifications | Supabase Auth e adaptador de e-mail transacional | testes do adaptador e APIs de evento | TASK-016 |
 | — | — | RNF-009 | — | plano de backup Supabase | operação | restauração testada antes de uso real | TASK-005,018 |
 
 ## Pendências
@@ -238,3 +241,4 @@ Supabase Auth gerencia credenciais, verificação e recuperação. A aplicação
 | PD-002 | Escolha final Route Handlers versus NestJS | ENCERRADA pelo ADR-001 aceito: Route Handlers no MVP; NestJS é alternativa futura. |
 | PD-003 | Detalhes de design visual e identidade da loja | Afeta interface, não regras de domínio; resolver antes de UI final. |
 | PD-004 | Retenção de eventos de navegação | Afeta privacidade e custo; definir antes de produção/uso externo. |
+| PD-005 | Interface e API de favoritos | A tabela e RLS existem, mas a jornada não foi implementada. Decisão do responsável (2026-11-11): manter o plano original de 18 TASKs, sem abrir TASK adicional nem implementar favoritos nesta entrega. RF-012 permanece SHOULD e parcialmente atendido pelas avaliações; favoritos ficam registrados como lacuna aceita desta entrega, sem alterar o requisito. |

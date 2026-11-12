@@ -21,7 +21,7 @@
 | 15 | TASK-015 | PHASE-04 | HIGH | TASK-014 | DONE |
 | 16 | TASK-016 | PHASE-04 | MEDIUM | TASK-015 | DONE |
 | 17 | TASK-017 | PHASE-04 | MEDIUM | TASK-016 | DONE |
-| 18 | TASK-018 | PHASE-04 | HIGH | TASK-017 | BLOCKED |
+| 18 | TASK-018 | PHASE-04 | HIGH | TASK-017 | DONE |
 
 ## Convenções comuns
 
@@ -249,7 +249,7 @@ Scope Guard: mudanças primárias PRIMARY dentro de `ALLOWED_CHANGES`; alteraç�
 
 ### TASK-010 Carrinho persistente
 
-**Status:** DONE  
+**Status:** DONE
 **Phase:** PHASE-03  
 **Priority:** HIGH  
 **Dependências:** TASK-009  
@@ -433,7 +433,7 @@ Gates aprovados nas execuções WSL informadas pelo usuário: `npm test` (18 arq
 
 ### TASK-018 Checkpoint PHASE-04 e entrega
 
-**Status:** BLOCKED  
+**Status:** DONE
 **Phase:** PHASE-04  
 **Priority:** HIGH  
 **Dependências:** TASK-017  
@@ -447,3 +447,23 @@ Gates aprovados nas execuções WSL informadas pelo usuário: `npm test` (18 arq
 
 **Critérios de aceitação:** matriz de rastreabilidade revisada; gates obrigatórios passam; pendências do professor são registradas.  
 **Testes necessários:** suíte completa, auditoria de dependências, acessibilidade E2E e revisão manual.
+
+**Etapas 001–004 — prontidão e início (2026-11-11):** TASK-017 `DONE` no commit `0197805`, incorporada ao `main` pelo merge `9dfb74e`; dependência satisfeita e árvore limpa. ADR-001/002/003 aceitos. A matriz do README cobre os RF/RN/RNF; PD-001 registra que requisitos acadêmicos posteriores dependem de retorno do professor. Scope Guard `ALLOWED_CHANGES`: testes, documentação, configuração de qualidade e `TASKS.md`; `INCIDENTAL_CHANGES_POLICY: NO_INCIDENTAL_CHANGES`; `FORBIDDEN_CHANGES`: funcionalidades novas, alteração de requisitos e integrações reais. Branch `chore/TASK-018-checkpoint-phase-04`. Plano PRIMARY: revisar matriz/evidências sem alterar requisitos; acrescentar um teste E2E de acessibilidade por teclado/semântica e um roteiro final de revisão; executar suíte unitária, lint, TypeScript, build, E2E, auditoria npm, reset/pgTAP e preparar revisão manual. Registrar pendências externas e vulnerabilidades sem ocultá-las. Se um gate detectar defeito de funcionalidade fora do Scope Guard, emitir SCOPE ESCALATION/BLOCKER em vez de corrigi-lo nesta TASK. Nenhuma alteração incidental prevista. GATE-001 a GATE-004 aprovados.
+
+**GATE-001 — recontextualização (2026-11-11):** fontes obrigatórias relidas; checkout limpo em `main` no merge `9dfb74e`, branch da TASK-018 criada a partir dele. GATE-001 APROVADO.
+
+**GATE-002 — contexto/histórico (2026-11-11):** relatório da TASK-017 confirma 114 testes unitários, pgTAP 178, E2E 6/6 e gates de build/lint/TypeScript; README registra PD-001. Inventário confirmou que favoritos possuem tabela/RLS, sem interface/API, e a matriz agrupava RN/UC incorretamente; gap será documentado como PD-005 e as linhas de rastreabilidade serão separadas, sem alterar RF. GATE-002 APROVADO.
+
+**GATE-003 — pré-condições (2026-11-11):** dependência mergeada; ADRs aceitos; Scope Guard/DoD claros; sem decisão arquitetural pendente para auditoria de teste e documentação. GATE-003 APROVADO.
+
+**GATE-004 — plano (2026-11-11):** plano de execução e critérios de saída registrados acima. E2E verifica nomes acessíveis, teclado e layouts 360/1280 px; roteiro humano ficará pendente até confirmação do responsável. GATE-004 APROVADO.
+
+**GATE-005 — implementação (2026-11-11):** matriz do README revisada, separando RF-012/013/014 e corrigindo rotas/UCs conforme APIs e escopo implementados; gap de favoritos registrado como PD-005, sem criar funcionalidade. Adicionado E2E de semântica, nomes acessíveis, foco por teclado e overflow em 360/1280 px; roteiro humano em `docs/testing/task-018-manual.md` com três casos pendentes. GATE-005 IMPLEMENTAÇÃO CONCLUÍDA.
+
+**GATE-006 — revisão e gates automáticos (2026-11-11, WSL/Node 24):** `npm test` PASSOU (26 arquivos/114 testes); `npm run lint` PASSOU; `npx --no-install tsc --noEmit` PASSOU; `npm run build` PASSOU (40 páginas estáticas); `npm run test:e2e` PASSOU (7/7); `npx --no-install supabase db reset --local` PASSOU; `npx --no-install supabase test db` PASSOU (9 arquivos/178 testes); `git -c core.autocrlf=true -c core.whitespace=cr-at-eol diff --check` PASSOU. A auditoria inicialmente encontrou 7 vulnerabilidades moderadas em dependências de desenvolvimento. Em vez do downgrade major proposto por `npm audit fix --force`, foi aplicado override restrito de `minimatch` para `^11.0.1`, somente sob `@typescript-eslint/typescript-estree`, cujo uso verificado é a função pública `minimatch()`. Após regenerar lockfile e executar `npm ci`, `npm audit` PASSOU (0 vulnerabilidades); lint, TypeScript, testes unitários, build e E2E foram repetidos e passaram. GATE-006 APROVADO.
+
+**GATE-007 — testes manuais (2026-11-11):** responsável confirmou MAN-018-01 e MAN-018-02 aprovados nesta conversa. Em MAN-018-03, decidiu manter o plano original de 18 TASKs; favoritos ficam como lacuna aceita nesta entrega, RF-012 permanece SHOULD e nenhuma TASK adicional será criada. Resultados registrados em `docs/testing/task-018-manual.md` e PD-005 no README. GATE-007 APROVADO por confirmação do responsável.
+
+**GATE-008 — validação final (2026-11-11):** matriz e pendências registradas; três verificações manuais aprovadas pelo responsável; todos os gates automatizados e auditoria npm passaram; Scope Guard PRIMARY respeitado, sem mudanças incidentais ou funcionais. Arquivos PRIMARY: `README.md`, `TASKS.md`, `package.json`, `package-lock.json`, `e2e/accessibility.spec.ts`, `docs/testing/task-018-manual.md`. Incidentes: nenhum. DoD atendido. TASK-018 DONE; próxima TASK: nenhuma, plano original encerrado em 18 TASKs.
+
+**Relatório final:** TASK-018 `DONE`, branch `chore/TASK-018-checkpoint-phase-04`, ainda sem commit. O override de segurança e o lockfile são configuração de qualidade dentro de `ALLOWED_CHANGES`; README e roteiro registram a decisão sobre favoritos como lacuna aceita nesta entrega, mantendo RF-012 sem alteração. Todos os gates aplicáveis passaram e o responsável confirmou os testes manuais. Nenhuma TASK posterior foi iniciada.
